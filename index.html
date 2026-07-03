@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>James Highlands Art | Photography</title>
-<meta name="description" content="James Highlands Art — fine art photography. Prints and original files available for purchase.">
+<title>James Highlands Art | Watercolor</title>
+<meta name="description" content="James Highlands Art — fine art watercolor. Prints and original files available for purchase.">
 <style>
   :root{
     --bg:#0b0b0c;
@@ -79,7 +79,14 @@
     position:relative;
     background:
       linear-gradient(180deg, rgba(11,11,12,0.15) 0%, rgba(11,11,12,0.75) 85%),
-      url('images/mountain-village.jpeg') center/cover no-repeat fixed;
+      url('images/valley-river.jpeg') center/cover no-repeat fixed;
+  }
+  @media(max-width:900px){
+    .hero{
+      background:
+        linear-gradient(180deg, rgba(11,11,12,0.15) 0%, rgba(11,11,12,0.75) 85%),
+        url('images/valley-river-mobile.jpeg') center/cover no-repeat scroll;
+    }
   }
   .hero-inner{
     padding:0 5vw 90px;
@@ -185,8 +192,22 @@
     filter:grayscale(15%) brightness(.92);
   }
   .g-item:hover img{transform:scale(1.06);filter:grayscale(0%) brightness(1);}
+  .g-item img, .lightbox img{
+    -webkit-user-select:none;user-select:none;
+    -webkit-touch-callout:none;
+    pointer-events:none;
+  }
+  .g-watermark, .lightbox-watermark{
+    position:absolute;inset:0;
+    z-index:2;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='180'%3E%3Cdefs%3E%3Cpattern id='wm' width='320' height='180' patternUnits='userSpaceOnUse' patternTransform='rotate(-25)'%3E%3Ctext x='0' y='100' font-family='Helvetica, Arial, sans-serif' font-size='20' fill='white' fill-opacity='0.45' letter-spacing='2'%3EJAMES HIGHLANDS ART%3C/text%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wm)'/%3E%3C/svg%3E");
+    background-repeat:repeat;
+    mix-blend-mode:overlay;
+  }
   .g-caption{
     position:absolute;left:0;right:0;bottom:0;
+    z-index:3;
     padding:22px;
     background:linear-gradient(0deg, rgba(0,0,0,.75), transparent);
     display:flex;justify-content:space-between;align-items:flex-end;
@@ -215,39 +236,6 @@
 
   @media(max-width:900px){
     .g1,.g2,.g3,.g4,.g5,.g6,.g7,.g8{grid-column:span 12;aspect-ratio:4/5;}
-  }
-
-  /* ABOUT */
-  .about{
-    padding:0 5vw 160px;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:80px;
-    border-top:1px solid var(--line);
-  }
-  .about-img{
-    aspect-ratio:4/5;
-    background:url('https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1400&auto=format&fit=crop') center/cover;
-    filter:grayscale(30%);
-  }
-  .about-text{
-    display:flex;flex-direction:column;
-    justify-content:center;
-    max-width:520px;
-  }
-  .about-text .section-num{margin-bottom:24px;}
-  .about-text p{
-    font-family:'Helvetica Neue',Arial,sans-serif;
-    font-weight:300;
-    font-size:17px;
-    line-height:1.8;
-    color:var(--ink-dim);
-    margin-bottom:20px;
-  }
-  .about-text p strong{color:var(--ink);font-weight:400;}
-
-  @media(max-width:900px){
-    .about{grid-template-columns:1fr;gap:40px;}
   }
 
   /* PROCESS / HOW BUYING WORKS */
@@ -333,6 +321,11 @@
     transition:opacity .4s ease;
   }
   .lightbox.open{opacity:1;pointer-events:all;}
+  .lightbox-img-wrap{
+    position:relative;
+    display:inline-block;
+    line-height:0;
+  }
   .lightbox img{
     max-width:82vw;max-height:78vh;
     object-fit:contain;
@@ -362,7 +355,6 @@
   <nav>
     <ul>
       <li><a href="#work">Work</a></li>
-      <li><a href="#about">About</a></li>
       <li><a href="#how">Prints</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
@@ -371,7 +363,7 @@
 
 <section class="hero">
   <div class="hero-inner">
-    <div class="hero-eyebrow">Fine Art Photography</div>
+    <div class="hero-eyebrow">Fine Art Watercolor</div>
     <h1>James<br>Highlands</h1>
     <p class="hero-sub">Landscapes and quiet moments, shot on film and light. Original files and prints available for purchase.</p>
   </div>
@@ -384,26 +376,16 @@
 </div>
 
 <div class="gallery" id="gallery">
-  <div class="g-item g1" data-title="Mountain Village" data-price="$220" data-img="images/mountain-village.jpeg"><img src="images/mountain-village.jpeg" alt="Mountain Village"></div>
-  <div class="g-item g2" data-title="Bird on Branch" data-price="$150" data-img="images/bird-on-branch.jpeg"><img src="images/bird-on-branch.jpeg" alt="Bird on Branch"></div>
-  <div class="g-item g6" data-title="Wildflower Meadow" data-price="$160" data-img="images/wildflower-meadow.jpeg"><img src="images/wildflower-meadow.jpeg" alt="Wildflower Meadow"></div>
-  <div class="g-item g7" data-title="The Reading Room" data-price="$175" data-img="images/reading-room.jpeg"><img src="images/reading-room.jpeg" alt="The Reading Room"></div>
+  <div class="g-item g1" data-title="Mountain Village" data-price="$220" data-img="images/mountain-village.jpeg"><img src="images/mountain-village.jpeg" alt="Mountain Village" draggable="false"><div class="g-watermark"></div></div>
+  <div class="g-item g2" data-title="Bird on Branch" data-price="$150" data-img="images/bird-on-branch.jpeg"><img src="images/bird-on-branch.jpeg" alt="Bird on Branch" draggable="false"><div class="g-watermark"></div></div>
+  <div class="g-item g6" data-title="Wildflower Meadow" data-price="$160" data-img="images/wildflower-meadow.jpeg"><img src="images/wildflower-meadow.jpeg" alt="Wildflower Meadow" draggable="false"><div class="g-watermark"></div></div>
+  <div class="g-item g7" data-title="The Reading Room" data-price="$175" data-img="images/reading-room.jpeg"><img src="images/reading-room.jpeg" alt="The Reading Room" draggable="false"><div class="g-watermark"></div></div>
 </div>
-
-<section class="about" id="about">
-  <div class="about-img"></div>
-  <div class="about-text">
-    <div class="section-num">02 — About</div>
-    <p><strong>James Highlands</strong> is a photographer working between coastlines and mountain light, drawn to the quiet, unremarkable moments most people walk past.</p>
-    <p>Every image on this site is shot on location, hand-edited, and available as a limited original file — not a print run, not a template. When you buy a photo here, you own the actual file, exactly as it left the camera and the edit desk.</p>
-    <p>Based between the highlands and the coast. Available for commissions and licensing.</p>
-  </div>
-</section>
 
 <section class="how" id="how">
   <div class="section-head" style="padding-top:0;border-top:none;">
     <h2>How Buying Works</h2>
-    <div class="section-num">03 — Process</div>
+    <div class="section-num">02 — Process</div>
   </div>
   <div class="how-grid">
     <div class="how-card">
@@ -442,7 +424,10 @@
 
 <div class="lightbox" id="lightbox">
   <div class="lightbox-close" id="lightboxClose">Close ✕</div>
-  <img src="" alt="" id="lightboxImg">
+  <div class="lightbox-img-wrap">
+    <img src="" alt="" id="lightboxImg" draggable="false">
+    <div class="lightbox-watermark"></div>
+  </div>
   <div class="lightbox-info">
     <div class="title" id="lightboxTitle"></div>
     <div class="price" id="lightboxPrice"></div>
@@ -451,6 +436,9 @@
 </div>
 
 <script>
+  // deter image saving (visual deterrent only — not a real DRM guarantee)
+  document.addEventListener('contextmenu', (e)=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
+
   // scroll reveal
   const items = document.querySelectorAll('.g-item');
   const io = new IntersectionObserver((entries)=>{
