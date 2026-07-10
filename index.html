@@ -188,6 +188,36 @@
   }
   .filter-btn:hover{color:var(--ink);border-color:var(--ink);}
   .filter-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+  .search-box{
+    display:flex;align-items:center;gap:10px;
+    margin-left:auto;
+    border:1px solid var(--line);
+    padding:10px 16px;
+    min-width:220px;
+  }
+  .search-box svg{flex-shrink:0;color:var(--ink-dim);}
+  .search-box input{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:13px;letter-spacing:.05em;
+    background:transparent;
+    border:none;outline:none;
+    color:var(--ink);
+    width:100%;
+  }
+  .search-box input::placeholder{color:var(--ink-dim);}
+  .search-box:focus-within{border-color:var(--ink);}
+  @media(max-width:900px){
+    .search-box{margin-left:0;width:100%;}
+  }
+  .no-results{
+    display:none;
+    grid-column:span 12;
+    padding:60px 0;
+    text-align:center;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-weight:300;
+    color:var(--ink-dim);
+  }
 
   /* GALLERY */
   .gallery{
@@ -400,6 +430,10 @@
   <button class="filter-btn" data-filter="wildlife">Wildlife</button>
   <button class="filter-btn" data-filter="botanical">Botanical</button>
   <button class="filter-btn" data-filter="interior">Interior</button>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input type="text" id="searchInput" placeholder="Search paintings..." autocomplete="off">
+  </div>
 </div>
 
 <div class="gallery" id="gallery">
@@ -419,6 +453,7 @@
     <div class="g-media"><img src="images/reading-room.jpeg" alt="The Reading Room" draggable="false"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Reading Room</span><span class="g-cat">Interior</span></div><span class="g-price">$65</span></div>
   </div>
+  <div class="no-results" id="noResults">No paintings match your search.</div>
 </div>
 
 <section class="how" id="how">
@@ -473,20 +508,35 @@
   // deter image saving (visual deterrent only — not a real DRM guarantee)
   document.addEventListener('contextmenu', (e)=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
 
-  // category filter
+  // category filter + search
   const filterBtns = document.querySelectorAll('.filter-btn');
   const galleryItems = document.querySelectorAll('.g-item');
+  const searchInput = document.getElementById('searchInput');
+  const noResults = document.getElementById('noResults');
+
+  function applyFilters(){
+    const filter = document.querySelector('.filter-btn.active').dataset.filter;
+    const query = searchInput.value.trim().toLowerCase();
+    let visible = 0;
+    galleryItems.forEach(item=>{
+      const inCategory = filter === 'all' || item.dataset.category === filter;
+      const haystack = (item.dataset.title + ' ' + item.dataset.category).toLowerCase();
+      const inSearch = query === '' || haystack.includes(query);
+      const match = inCategory && inSearch;
+      item.classList.toggle('g-hidden', !match);
+      if(match) visible++;
+    });
+    noResults.style.display = visible === 0 ? 'block' : 'none';
+  }
+
   filterBtns.forEach(btn=>{
     btn.addEventListener('click', ()=>{
       filterBtns.forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
-      const filter = btn.dataset.filter;
-      galleryItems.forEach(item=>{
-        const match = filter === 'all' || item.dataset.category === filter;
-        item.classList.toggle('g-hidden', !match);
-      });
+      applyFilters();
     });
   });
+  searchInput.addEventListener('input', applyFilters);
 
   // scroll reveal
   const items = document.querySelectorAll('.g-item');
