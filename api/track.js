@@ -1,10 +1,13 @@
-import { neon } from '@neondatabase/serverless';
+import postgres from 'postgres';
 import crypto from 'node:crypto';
 
+let _sql;
 function getSql() {
   const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
   if (!url) throw new Error('No database configured yet (DATABASE_URL is not set).');
-  return neon(url);
+  // prepare:false is required for Supabase's transaction pooler
+  if (!_sql) _sql = postgres(url, { ssl: 'require', prepare: false });
+  return _sql;
 }
 
 let ensured = false;
