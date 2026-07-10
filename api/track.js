@@ -36,13 +36,20 @@ function deviceType(ua) {
   return 'desktop';
 }
 
+// crawlers, link-preview bots, monitors, and scripted HTTP clients
+const BOT_RE = /bot|crawl|spider|slurp|mediapartners|facebookexternalhit|embedly|quora|pinterest|slackbot|telegram|whatsapp|discord|headless|phantomjs|python-requests|curl\/|wget|axios|go-http|node-fetch|okhttp|java\/|libwww|monitor|uptime|pingdom|lighthouse|scrapy|semrush|ahrefs|mj12bot|dotbot|dataforseo|petalbot|bytespider/i;
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') { res.status(405).end(); return; }
+
+  const ua = (req.headers['user-agent'] || '').slice(0, 400);
+  // silently skip bots/scripts so they don't pollute the stats
+  if (!ua || BOT_RE.test(ua)) { res.status(204).end(); return; }
+
   try {
     const sql = getSql();
     await ensureTable(sql);
 
-    const ua = (req.headers['user-agent'] || '').slice(0, 400);
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
     const country = req.headers['x-vercel-ip-country'] || null;
     const city = req.headers['x-vercel-ip-city']
