@@ -24,6 +24,9 @@ async function ensureTable(sql) {
     user_agent TEXT,
     visitor TEXT
   )`;
+  // lock the table to our owner-role connection only; blocks Supabase's
+  // public API (anon key). Our direct connection bypasses RLS.
+  await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
   ensured = true;
 }
 

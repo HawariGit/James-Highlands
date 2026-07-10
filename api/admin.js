@@ -21,6 +21,7 @@ async function ensureTable(sql) {
     user_agent TEXT,
     visitor TEXT
   )`;
+  await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
 }
 
 const esc = (s) => String(s == null ? '' : s)
