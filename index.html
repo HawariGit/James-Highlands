@@ -505,6 +505,18 @@
 </div>
 
 <script>
+  // visit logging (fire-and-forget, never blocks the page)
+  (function(){
+    try {
+      var payload = JSON.stringify({ path: location.pathname, referrer: document.referrer });
+      if (navigator.sendBeacon) {
+        navigator.sendBeacon('/api/track', new Blob([payload], {type:'application/json'}));
+      } else {
+        fetch('/api/track', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){});
+      }
+    } catch(e){}
+  })();
+
   // deter image saving (visual deterrent only — not a real DRM guarantee)
   document.addEventListener('contextmenu', (e)=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
 
