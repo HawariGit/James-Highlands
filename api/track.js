@@ -1,10 +1,14 @@
 import { neon } from '@neondatabase/serverless';
 import crypto from 'node:crypto';
 
-const sql = neon(process.env.DATABASE_URL || process.env.POSTGRES_URL);
+function getSql() {
+  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!url) throw new Error('No database configured yet (DATABASE_URL is not set).');
+  return neon(url);
+}
 
 let ensured = false;
-async function ensureTable() {
+async function ensureTable(sql) {
   if (ensured) return;
   await sql`CREATE TABLE IF NOT EXISTS visits (
     id SERIAL PRIMARY KEY,
@@ -29,7 +33,8 @@ function deviceType(ua) {
 export default async function handler(req, res) {
   if (req.method !== 'POST') { res.status(405).end(); return; }
   try {
-    await ensureTable();
+    const sql = getSql();
+    await ensureTable(sql);
 
     const ua = (req.headers['user-agent'] || '').slice(0, 400);
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();

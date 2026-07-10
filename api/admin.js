@@ -1,8 +1,12 @@
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon(process.env.DATABASE_URL || process.env.POSTGRES_URL);
+function getSql() {
+  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!url) throw new Error('No database configured yet (DATABASE_URL is not set).');
+  return neon(url);
+}
 
-async function ensureTable() {
+async function ensureTable(sql) {
   await sql`CREATE TABLE IF NOT EXISTS visits (
     id SERIAL PRIMARY KEY,
     ts TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -32,14 +36,16 @@ function bars(rows, labelKey, valKey) {
 }
 
 export default async function handler(req, res) {
-  if ((req.query.pw || '') !== (process.env.ADMIN_PW || '')) {
+  const expected = process.env.ADMIN_PW || '';
+  if (!expected || (req.query.pw || '') !== expected) {
     res.status(401).setHeader('content-type', 'text/html');
     res.send('<body style="font-family:system-ui;background:#0b0b0c;color:#ece6da;display:flex;height:100vh;align-items:center;justify-content:center;margin:0"><div>401 — Unauthorized</div></body>');
     return;
   }
 
   try {
-    await ensureTable();
+    const sql = getSql();
+    await ensureTable(sql);
 
     const [totals] = await sql`SELECT
       count(*)::int AS total,
