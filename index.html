@@ -578,7 +578,7 @@
       lbPrice.textContent = price + ' — Original File';
       lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + title) + '&body=' + encodeURIComponent('Hi James, I would like to purchase the original file for "' + title + '" (' + price + ').');
       lightbox.classList.add('open');
-      sendTrack({ event: 'click', painting: title });
+      sendTrack({ event: 'click', painting: title, category: item.dataset.category });
     });
   });
 

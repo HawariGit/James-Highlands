@@ -23,6 +23,7 @@ async function ensureTable(sql) {
   )`;
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS event TEXT NOT NULL DEFAULT 'pageview'`;
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS painting TEXT`;
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS category TEXT`;
   await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
 }
 
@@ -69,6 +70,8 @@ export default async function handler(req, res) {
       FROM visits WHERE event = 'pageview' GROUP BY device ORDER BY c DESC`;
     const byPainting = await sql`SELECT painting, count(*)::int AS c
       FROM visits WHERE event = 'click' AND painting IS NOT NULL GROUP BY painting ORDER BY c DESC LIMIT 10`;
+    const byCategory = await sql`SELECT initcap(category) AS category, count(*)::int AS c
+      FROM visits WHERE event = 'click' AND category IS NOT NULL GROUP BY category ORDER BY c DESC LIMIT 10`;
     const recent = await sql`SELECT ts, path, referrer, country, city, device, event, painting
       FROM visits ORDER BY ts DESC LIMIT 100`;
 
@@ -131,6 +134,7 @@ export default async function handler(req, res) {
   </div>
   <div class="grid">
     <div class="panel"><h2>Top paintings (clicks)</h2>${bars(byPainting, 'painting', 'c') || '<div class="sub">No clicks yet</div>'}</div>
+    <div class="panel"><h2>Top categories (clicks)</h2>${bars(byCategory, 'category', 'c') || '<div class="sub">No clicks yet</div>'}</div>
     <div class="panel"><h2>Visits per day (14d)</h2>${bars(perDay, 'day', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Top countries</h2>${bars(byCountry, 'country', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Devices</h2>${bars(byDevice, 'device', 'c') || '<div class="sub">No data yet</div>'}</div>
