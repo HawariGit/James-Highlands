@@ -24,6 +24,7 @@ async function ensureTable(sql) {
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS event TEXT NOT NULL DEFAULT 'pageview'`;
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS painting TEXT`;
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS category TEXT`;
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS query TEXT`;
   await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
 }
 
@@ -59,7 +60,8 @@ export default async function handler(req, res) {
       count(distinct visitor) FILTER (WHERE event = 'pageview')::int AS uniques,
       count(*) FILTER (WHERE event = 'pageview' AND ts::date = now()::date)::int AS today,
       count(*) FILTER (WHERE event = 'pageview' AND ts > now() - interval '7 days')::int AS week,
-      count(*) FILTER (WHERE event = 'click')::int AS clicks
+      count(*) FILTER (WHERE event = 'click')::int AS clicks,
+      count(*) FILTER (WHERE event = 'buy')::int AS buys
       FROM visits`;
 
     const perDay = await sql`SELECT to_char(ts::date,'Mon DD') AS day, count(*)::int AS c
@@ -72,17 +74,37 @@ export default async function handler(req, res) {
       FROM visits WHERE event = 'click' AND painting IS NOT NULL GROUP BY painting ORDER BY c DESC LIMIT 10`;
     const byCategory = await sql`SELECT initcap(category) AS category, count(*)::int AS c
       FROM visits WHERE event = 'click' AND category IS NOT NULL GROUP BY category ORDER BY c DESC LIMIT 10`;
-    const recent = await sql`SELECT ts, path, referrer, country, city, device, event, painting
+    const byBuy = await sql`SELECT painting, count(*)::int AS c
+      FROM visits WHERE event = 'buy' AND painting IS NOT NULL GROUP BY painting ORDER BY c DESC LIMIT 10`;
+    const byReferrer = await sql`SELECT
+      coalesce(nullif(split_part(split_part(coalesce(referrer, ''), '://', 2), '/', 1), ''), 'direct') AS source,
+      count(*)::int AS c
+      FROM visits WHERE event = 'pageview' GROUP BY source ORDER BY c DESC LIMIT 8`;
+    const bySearch = await sql`SELECT query, count(*)::int AS c
+      FROM visits WHERE event = 'search' AND query IS NOT NULL AND query <> '' GROUP BY query ORDER BY c DESC LIMIT 10`;
+    const byHour = await sql`SELECT to_char(ts, 'HH24') || ':00' AS hour, count(*)::int AS c
+      FROM visits WHERE event = 'pageview' GROUP BY 1 ORDER BY 1`;
+    const recent = await sql`SELECT ts, path, referrer, country, city, device, event, painting, query
       FROM visits ORDER BY ts DESC LIMIT 100`;
 
     const stat = (label, val) => `<div class="stat"><div class="stat-val">${esc(val)}</div><div class="stat-label">${esc(label)}</div></div>`;
 
+    const pct = (n, d) => d > 0 ? Math.round((n / d) * 100) + '%' : '—';
+    const funnelRow = (stage, num, sub) =>
+      `<div class="funnel-row"><span class="funnel-stage">${stage}</span><span><span class="funnel-num">${num}</span><span class="funnel-pct">${sub}</span></span></div>`;
+    const funnel =
+      funnelRow('Visits', totals.total, '') +
+      funnelRow('Opened a painting', totals.clicks, pct(totals.clicks, totals.total) + ' of visits') +
+      funnelRow('Clicked buy', totals.buys, pct(totals.buys, totals.total) + ' of visits · ' + pct(totals.buys, totals.clicks) + ' of opens');
+
     const rows = recent.map(r => {
       const when = esc(new Date(r.ts).toISOString().replace('T', ' ').slice(0, 19));
       const loc = esc([r.city, r.country].filter(Boolean).join(', ') || '—');
-      const what = r.event === 'click'
-        ? `<span class="tag tag-click">click</span>${esc(r.painting || '')}`
-        : `<span class="tag">view</span>${esc(r.path)}`;
+      let what;
+      if (r.event === 'buy') what = `<span class="tag tag-buy">buy</span>${esc(r.painting || '')}`;
+      else if (r.event === 'click') what = `<span class="tag tag-click">click</span>${esc(r.painting || '')}`;
+      else if (r.event === 'search') what = `<span class="tag tag-search">search</span>${esc(r.query || '')}`;
+      else what = `<span class="tag">view</span>${esc(r.path)}`;
       return `<tr>
         <td class="mono">${when}</td>
         <td>${what}</td>
@@ -113,6 +135,13 @@ export default async function handler(req, res) {
   .bar-label{width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .tag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(33,31,28,.1);color:var(--dim);margin-right:6px;}
   .tag-click{background:var(--accent);color:#fff;}
+  .tag-buy{background:#2e7d32;color:#fff;}
+  .tag-search{background:#5b6dc9;color:#fff;}
+  .funnel-row{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-bottom:1px solid var(--line);}
+  .funnel-row:last-child{border-bottom:none;}
+  .funnel-stage{font-size:14px;}
+  .funnel-num{font-family:Georgia,serif;font-size:20px;}
+  .funnel-pct{font-size:12px;color:var(--dim);margin-left:8px;}
   .bar-track{flex:1;height:8px;background:rgba(33,31,28,.08);border-radius:4px;overflow:hidden;}
   .bar-fill{display:block;height:100%;background:var(--accent);}
   .bar-val{width:44px;text-align:right;flex-shrink:0;color:var(--dim);}
@@ -131,10 +160,16 @@ export default async function handler(req, res) {
     ${stat('Today', totals.today)}
     ${stat('Last 7 days', totals.week)}
     ${stat('Painting clicks', totals.clicks)}
+    ${stat('Buy clicks', totals.buys)}
   </div>
   <div class="grid">
+    <div class="panel"><h2>Funnel</h2>${funnel}</div>
+    <div class="panel"><h2>Buy intent (buy clicks)</h2>${bars(byBuy, 'painting', 'c') || '<div class="sub">No buy clicks yet</div>'}</div>
+    <div class="panel"><h2>Traffic sources</h2>${bars(byReferrer, 'source', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Top paintings (clicks)</h2>${bars(byPainting, 'painting', 'c') || '<div class="sub">No clicks yet</div>'}</div>
     <div class="panel"><h2>Top categories (clicks)</h2>${bars(byCategory, 'category', 'c') || '<div class="sub">No clicks yet</div>'}</div>
+    <div class="panel"><h2>Top searches</h2>${bars(bySearch, 'query', 'c') || '<div class="sub">No searches yet</div>'}</div>
+    <div class="panel"><h2>Peak hours (UTC)</h2>${bars(byHour, 'hour', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Visits per day (14d)</h2>${bars(perDay, 'day', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Top countries</h2>${bars(byCountry, 'country', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Devices</h2>${bars(byDevice, 'device', 'c') || '<div class="sub">No data yet</div>'}</div>

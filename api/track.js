@@ -28,6 +28,7 @@ async function ensureTable(sql) {
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS event TEXT NOT NULL DEFAULT 'pageview'`;
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS painting TEXT`;
   await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS category TEXT`;
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS query TEXT`;
   // lock the table to our owner-role connection only; blocks Supabase's
   // public API (anon key). Our direct connection bypasses RLS.
   await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
@@ -69,12 +70,15 @@ export default async function handler(req, res) {
     body = body || {};
     const path = (body.path || '/').slice(0, 300);
     const referrer = body.referrer ? String(body.referrer).slice(0, 300) : null;
-    const event = body.event === 'click' ? 'click' : 'pageview';
-    const painting = event === 'click' && body.painting ? String(body.painting).slice(0, 200) : null;
-    const category = event === 'click' && body.category ? String(body.category).slice(0, 80) : null;
+    const ev = body.event;
+    const event = (ev === 'click' || ev === 'buy' || ev === 'search') ? ev : 'pageview';
+    const hasPiece = event === 'click' || event === 'buy';
+    const painting = hasPiece && body.painting ? String(body.painting).slice(0, 200) : null;
+    const category = hasPiece && body.category ? String(body.category).slice(0, 80) : null;
+    const query = event === 'search' && body.query ? String(body.query).slice(0, 120) : null;
 
-    await sql`INSERT INTO visits (path, referrer, country, city, device, user_agent, visitor, event, painting, category)
-      VALUES (${path}, ${referrer}, ${country}, ${city}, ${deviceType(ua)}, ${ua}, ${visitor}, ${event}, ${painting}, ${category})`;
+    await sql`INSERT INTO visits (path, referrer, country, city, device, user_agent, visitor, event, painting, category, query)
+      VALUES (${path}, ${referrer}, ${country}, ${city}, ${deviceType(ua)}, ${ua}, ${visitor}, ${event}, ${painting}, ${category}, ${query})`;
 
     res.status(204).end();
   } catch (e) {
