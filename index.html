@@ -505,17 +505,18 @@
 </div>
 
 <script>
-  // visit logging (fire-and-forget, never blocks the page)
-  (function(){
+  // visit + click logging (fire-and-forget, never blocks the page)
+  function sendTrack(payload){
     try {
-      var payload = JSON.stringify({ path: location.pathname, referrer: document.referrer });
+      var body = JSON.stringify(payload);
       if (navigator.sendBeacon) {
-        navigator.sendBeacon('/api/track', new Blob([payload], {type:'application/json'}));
+        navigator.sendBeacon('/api/track', new Blob([body], {type:'application/json'}));
       } else {
-        fetch('/api/track', {method:'POST', headers:{'Content-Type':'application/json'}, body:payload, keepalive:true}).catch(function(){});
+        fetch('/api/track', {method:'POST', headers:{'Content-Type':'application/json'}, body:body, keepalive:true}).catch(function(){});
       }
     } catch(e){}
-  })();
+  }
+  sendTrack({ path: location.pathname, referrer: document.referrer });
 
   // deter image saving (visual deterrent only — not a real DRM guarantee)
   document.addEventListener('contextmenu', (e)=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
@@ -577,6 +578,7 @@
       lbPrice.textContent = price + ' — Original File';
       lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + title) + '&body=' + encodeURIComponent('Hi James, I would like to purchase the original file for "' + title + '" (' + price + ').');
       lightbox.classList.add('open');
+      sendTrack({ event: 'click', painting: title });
     });
   });
 

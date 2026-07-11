@@ -24,6 +24,9 @@ async function ensureTable(sql) {
     user_agent TEXT,
     visitor TEXT
   )`;
+  // add event/painting columns for click tracking (migrates existing tables)
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS event TEXT NOT NULL DEFAULT 'pageview'`;
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS painting TEXT`;
   // lock the table to our owner-role connection only; blocks Supabase's
   // public API (anon key). Our direct connection bypasses RLS.
   await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
@@ -65,9 +68,11 @@ export default async function handler(req, res) {
     body = body || {};
     const path = (body.path || '/').slice(0, 300);
     const referrer = body.referrer ? String(body.referrer).slice(0, 300) : null;
+    const event = body.event === 'click' ? 'click' : 'pageview';
+    const painting = event === 'click' && body.painting ? String(body.painting).slice(0, 200) : null;
 
-    await sql`INSERT INTO visits (path, referrer, country, city, device, user_agent, visitor)
-      VALUES (${path}, ${referrer}, ${country}, ${city}, ${deviceType(ua)}, ${ua}, ${visitor})`;
+    await sql`INSERT INTO visits (path, referrer, country, city, device, user_agent, visitor, event, painting)
+      VALUES (${path}, ${referrer}, ${country}, ${city}, ${deviceType(ua)}, ${ua}, ${visitor}, ${event}, ${painting})`;
 
     res.status(204).end();
   } catch (e) {

@@ -21,6 +21,8 @@ async function ensureTable(sql) {
     user_agent TEXT,
     visitor TEXT
   )`;
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS event TEXT NOT NULL DEFAULT 'pageview'`;
+  await sql`ALTER TABLE visits ADD COLUMN IF NOT EXISTS painting TEXT`;
   await sql`ALTER TABLE visits ENABLE ROW LEVEL SECURITY`;
 }
 
@@ -52,32 +54,40 @@ export default async function handler(req, res) {
     await ensureTable(sql);
 
     const [totals] = await sql`SELECT
-      count(*)::int AS total,
-      count(distinct visitor)::int AS uniques,
-      count(*) FILTER (WHERE ts::date = now()::date)::int AS today,
-      count(*) FILTER (WHERE ts > now() - interval '7 days')::int AS week
+      count(*) FILTER (WHERE event = 'pageview')::int AS total,
+      count(distinct visitor) FILTER (WHERE event = 'pageview')::int AS uniques,
+      count(*) FILTER (WHERE event = 'pageview' AND ts::date = now()::date)::int AS today,
+      count(*) FILTER (WHERE event = 'pageview' AND ts > now() - interval '7 days')::int AS week,
+      count(*) FILTER (WHERE event = 'click')::int AS clicks
       FROM visits`;
 
     const perDay = await sql`SELECT to_char(ts::date,'Mon DD') AS day, count(*)::int AS c
-      FROM visits WHERE ts > now() - interval '14 days' GROUP BY ts::date ORDER BY ts::date`;
+      FROM visits WHERE event = 'pageview' AND ts > now() - interval '14 days' GROUP BY ts::date ORDER BY ts::date`;
     const byCountry = await sql`SELECT coalesce(country,'??') AS country, count(*)::int AS c
-      FROM visits GROUP BY country ORDER BY c DESC LIMIT 8`;
+      FROM visits WHERE event = 'pageview' GROUP BY country ORDER BY c DESC LIMIT 8`;
     const byDevice = await sql`SELECT coalesce(device,'?') AS device, count(*)::int AS c
-      FROM visits GROUP BY device ORDER BY c DESC`;
-    const byPath = await sql`SELECT coalesce(path,'/') AS path, count(*)::int AS c
-      FROM visits GROUP BY path ORDER BY c DESC LIMIT 8`;
-    const recent = await sql`SELECT ts, path, referrer, country, city, device
+      FROM visits WHERE event = 'pageview' GROUP BY device ORDER BY c DESC`;
+    const byPainting = await sql`SELECT painting, count(*)::int AS c
+      FROM visits WHERE event = 'click' AND painting IS NOT NULL GROUP BY painting ORDER BY c DESC LIMIT 10`;
+    const recent = await sql`SELECT ts, path, referrer, country, city, device, event, painting
       FROM visits ORDER BY ts DESC LIMIT 100`;
 
     const stat = (label, val) => `<div class="stat"><div class="stat-val">${esc(val)}</div><div class="stat-label">${esc(label)}</div></div>`;
 
-    const rows = recent.map(r => `<tr>
-      <td class="mono">${esc(new Date(r.ts).toISOString().replace('T', ' ').slice(0, 19))}</td>
-      <td>${esc(r.path)}</td>
-      <td>${esc([r.city, r.country].filter(Boolean).join(', ') || '—')}</td>
-      <td>${esc(r.device)}</td>
-      <td class="ref">${esc(r.referrer || 'direct')}</td>
-    </tr>`).join('');
+    const rows = recent.map(r => {
+      const when = esc(new Date(r.ts).toISOString().replace('T', ' ').slice(0, 19));
+      const loc = esc([r.city, r.country].filter(Boolean).join(', ') || '—');
+      const what = r.event === 'click'
+        ? `<span class="tag tag-click">click</span>${esc(r.painting || '')}`
+        : `<span class="tag">view</span>${esc(r.path)}`;
+      return `<tr>
+        <td class="mono">${when}</td>
+        <td>${what}</td>
+        <td>${loc}</td>
+        <td>${esc(r.device)}</td>
+        <td class="ref">${esc(r.referrer || 'direct')}</td>
+      </tr>`;
+    }).join('');
 
     const html = `<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -97,7 +107,9 @@ export default async function handler(req, res) {
   .panel{background:var(--card);border:1px solid var(--line);padding:22px;}
   .panel h2{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:18px;}
   .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px;}
-  .bar-label{width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar-label{width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .tag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;background:rgba(33,31,28,.1);color:var(--dim);margin-right:6px;}
+  .tag-click{background:var(--accent);color:#fff;}
   .bar-track{flex:1;height:8px;background:rgba(33,31,28,.08);border-radius:4px;overflow:hidden;}
   .bar-fill{display:block;height:100%;background:var(--accent);}
   .bar-val{width:44px;text-align:right;flex-shrink:0;color:var(--dim);}
@@ -115,16 +127,17 @@ export default async function handler(req, res) {
     ${stat('Unique visitors', totals.uniques)}
     ${stat('Today', totals.today)}
     ${stat('Last 7 days', totals.week)}
+    ${stat('Painting clicks', totals.clicks)}
   </div>
   <div class="grid">
+    <div class="panel"><h2>Top paintings (clicks)</h2>${bars(byPainting, 'painting', 'c') || '<div class="sub">No clicks yet</div>'}</div>
     <div class="panel"><h2>Visits per day (14d)</h2>${bars(perDay, 'day', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Top countries</h2>${bars(byCountry, 'country', 'c') || '<div class="sub">No data yet</div>'}</div>
     <div class="panel"><h2>Devices</h2>${bars(byDevice, 'device', 'c') || '<div class="sub">No data yet</div>'}</div>
-    <div class="panel"><h2>Top pages</h2>${bars(byPath, 'path', 'c') || '<div class="sub">No data yet</div>'}</div>
   </div>
   <div class="table-wrap">
     <table>
-      <thead><tr><th>Time (UTC)</th><th>Path</th><th>Location</th><th>Device</th><th>Referrer</th></tr></thead>
+      <thead><tr><th>Time (UTC)</th><th>Event</th><th>Location</th><th>Device</th><th>Referrer</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="5" style="color:var(--dim);padding:30px 12px">No visits recorded yet.</td></tr>'}</tbody>
     </table>
   </div>
