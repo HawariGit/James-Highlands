@@ -444,19 +444,19 @@
 </div>
 
 <div class="gallery" id="gallery">
-  <div class="g-item g1" data-category="landscape" data-title="Mountain Village" data-price="$90" data-img="images/mountain-village.jpeg">
+  <div class="g-item g1" data-category="landscape" data-tags="mountain mountains village town houses buildings valley wadi hills rocks cliffs palms trees green terraces landscape scenery" data-title="Mountain Village" data-price="$90" data-img="images/mountain-village.jpeg">
     <div class="g-media"><img src="images/mountain-village.jpeg" alt="Mountain Village" draggable="false"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Mountain Village</span><span class="g-cat">Landscape</span></div><span class="g-price">$90</span></div>
   </div>
-  <div class="g-item g2" data-category="wildlife" data-title="Bird on Branch" data-price="$75" data-img="images/bird-on-branch.jpeg">
+  <div class="g-item g2" data-category="wildlife" data-tags="bird birds branch blossom blossoms flowers wildlife animal animals nature spring feathers kingfisher wings" data-title="Bird on Branch" data-price="$75" data-img="images/bird-on-branch.jpeg">
     <div class="g-media"><img src="images/bird-on-branch.jpeg" alt="Bird on Branch" draggable="false"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Bird on Branch</span><span class="g-cat">Wildlife</span></div><span class="g-price">$75</span></div>
   </div>
-  <div class="g-item g6" data-category="botanical" data-title="Wildflower Meadow" data-price="$55" data-img="images/wildflower-meadow.jpeg">
+  <div class="g-item g6" data-category="botanical" data-tags="flower flowers wildflower wildflowers meadow meadows field poppies daisies garden blooms botanical colorful nature grass floral" data-title="Wildflower Meadow" data-price="$55" data-img="images/wildflower-meadow.jpeg">
     <div class="g-media"><img src="images/wildflower-meadow.jpeg" alt="Wildflower Meadow" draggable="false"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Wildflower Meadow</span><span class="g-cat">Botanical</span></div><span class="g-price">$55</span></div>
   </div>
-  <div class="g-item g7" data-category="interior" data-title="The Reading Room" data-price="$65" data-img="images/reading-room.jpeg">
+  <div class="g-item g7" data-category="interior" data-tags="room chair chairs books book bookshelf shelf shelves interior window library cozy furniture indoors reading study lamp" data-title="The Reading Room" data-price="$65" data-img="images/reading-room.jpeg">
     <div class="g-media"><img src="images/reading-room.jpeg" alt="The Reading Room" draggable="false"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Reading Room</span><span class="g-cat">Interior</span></div><span class="g-price">$65</span></div>
   </div>
@@ -545,7 +545,7 @@
       if (type === 'category') inFilter = item.dataset.category === val;
       else if (type === 'region') inFilter = item.dataset.region === val;
       else inFilter = true; // all
-      const haystack = (item.dataset.title + ' ' + item.dataset.category + ' ' + (item.dataset.region || '')).toLowerCase();
+      const haystack = (item.dataset.title + ' ' + item.dataset.category + ' ' + (item.dataset.region || '') + ' ' + (item.dataset.tags || '')).toLowerCase();
       const inSearch = query === '' || haystack.includes(query);
       const match = inFilter && inSearch;
       item.classList.toggle('g-hidden', !match);
