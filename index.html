@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>James Highlands Art | Watercolor</title>
-<meta name="description" content="James Highlands Art — fine art watercolor. Prints and original files available for purchase.">
+<meta name="description" content="James Highlands Art — fine art watercolor. Prints and soft copy files available for purchase.">
 <style>
   :root{
     --bg:#FFF2DB;
@@ -416,7 +416,7 @@
   <div class="hero-inner">
     <div class="hero-eyebrow">Fine Art Watercolor</div>
     <h1>James<br>Highlands</h1>
-    <p class="hero-sub">Landscapes and quiet moments, shot on film and light. Original files and prints available for purchase.</p>
+    <p class="hero-sub">Landscapes and quiet moments, shot on film and light. Soft copy files and prints available for purchase.</p>
   </div>
   <div class="scroll-cue">Scroll</div>
 </section>
@@ -481,8 +481,8 @@
     </div>
     <div class="how-card">
       <div class="num">03</div>
-      <h3>Receive the original</h3>
-      <p>Once payment is confirmed, you'll receive the full-resolution original file directly.</p>
+      <h3>Receive the soft copy</h3>
+      <p>Once payment is confirmed, you'll receive the full-resolution soft copy file directly.</p>
     </div>
   </div>
 </section>
@@ -507,7 +507,7 @@
   <div class="lightbox-info">
     <div class="title" id="lightboxTitle"></div>
     <div class="price" id="lightboxPrice"></div>
-    <a class="btn lightbox-buy" href="mailto:james.highlands.art@outlook.com" id="lightboxBuy">Buy Original</a>
+    <a class="btn lightbox-buy" href="mailto:james.highlands.art@outlook.com" id="lightboxBuy">Buy Soft Copy</a>
   </div>
 </div>
 
@@ -600,14 +600,14 @@
       lbImg.src = img;
       lbImg.alt = title;
       lbTitle.textContent = title;
-      lbPrice.textContent = price + ' — Original File';
-      lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + title) + '&body=' + encodeURIComponent('Hi James, I would like to purchase the original file for "' + title + '" (' + price + ').');
+      lbPrice.textContent = price + ' — Soft Copy File';
+      lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + title) + '&body=' + encodeURIComponent('Hi James, I would like to purchase the soft copy file for "' + title + '" (' + price + ').');
       lightbox.classList.add('open');
       sendTrack({ event: 'click', painting: title, category: item.dataset.category });
     });
   });
 
-  // buy-intent: fires when the "Buy Original" button is clicked
+  // buy-intent: fires when the "Buy Soft Copy" button is clicked
   lbBuy.addEventListener('click', ()=>{ sendTrack({ event: 'buy', painting: currentPainting, category: currentCategory }); });
 
   document.getElementById('lightboxClose').addEventListener('click', ()=> lightbox.classList.remove('open'));
