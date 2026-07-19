@@ -41,27 +41,27 @@ export default async function handler(req, res) {
       count(*) FILTER (WHERE event = 'click')::int AS clicks,
       count(*) FILTER (WHERE event = 'buy')::int AS buys,
       count(*) FILTER (WHERE event = 'search')::int AS searches
-      FROM visits WHERE ts > now() - interval '14 days'`;
+      FROM visits WHERE ts > now() - interval '7 days'`;
 
     const paintings = await sql`SELECT painting, count(*)::int AS c FROM visits
-      WHERE event = 'click' AND painting IS NOT NULL AND ts > now() - interval '14 days'
+      WHERE event = 'click' AND painting IS NOT NULL AND ts > now() - interval '7 days'
       GROUP BY painting ORDER BY c DESC LIMIT 5`;
     const categories = await sql`SELECT initcap(category) AS category, count(*)::int AS c FROM visits
-      WHERE event = 'click' AND category IS NOT NULL AND ts > now() - interval '14 days'
+      WHERE event = 'click' AND category IS NOT NULL AND ts > now() - interval '7 days'
       GROUP BY category ORDER BY c DESC LIMIT 5`;
     const buys = await sql`SELECT painting, count(*)::int AS c FROM visits
-      WHERE event = 'buy' AND painting IS NOT NULL AND ts > now() - interval '14 days'
+      WHERE event = 'buy' AND painting IS NOT NULL AND ts > now() - interval '7 days'
       GROUP BY painting ORDER BY c DESC LIMIT 5`;
     const sources = await sql`SELECT
       coalesce(nullif(split_part(split_part(coalesce(referrer, ''), '://', 2), '/', 1), ''), 'direct') AS source,
       count(*)::int AS c FROM visits
-      WHERE event = 'pageview' AND ts > now() - interval '14 days'
+      WHERE event = 'pageview' AND ts > now() - interval '7 days'
       GROUP BY source ORDER BY c DESC LIMIT 5`;
     const searches = await sql`SELECT query, count(*)::int AS c FROM visits
-      WHERE event = 'search' AND query IS NOT NULL AND ts > now() - interval '14 days'
+      WHERE event = 'search' AND query IS NOT NULL AND ts > now() - interval '7 days'
       GROUP BY query ORDER BY c DESC LIMIT 5`;
     const countries = await sql`SELECT coalesce(country,'??') AS country, count(*)::int AS c FROM visits
-      WHERE event = 'pageview' AND ts > now() - interval '14 days'
+      WHERE event = 'pageview' AND ts > now() - interval '7 days'
       GROUP BY country ORDER BY c DESC LIMIT 5`;
 
     const period = new Date().toISOString().slice(0, 10);
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
     const html = `<div style="font-family:'Helvetica Neue',Arial,sans-serif;color:#211f1c;max-width:560px;margin:0 auto;padding:24px">
       <h1 style="font-family:Georgia,serif;font-weight:400;font-size:26px;margin-bottom:2px">James Highlands Art</h1>
-      <p style="color:#8a8272;font-size:13px;margin-top:0">Visitor report · last 14 days · ${period}</p>
+      <p style="color:#8a8272;font-size:13px;margin-top:0">Visitor report · last 7 days · ${period}</p>
       <table style="border-collapse:separate;border-spacing:6px;width:100%"><tr>
         ${stat('Visits', t.visits)}
         ${stat('Unique', t.uniques)}
@@ -97,7 +97,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         from: 'James Highlands Art <onboarding@resend.dev>',
         to: [to],
-        subject: `Art site report — ${t.visits} visits, ${t.buys} buy clicks (last 14 days)`,
+        subject: `Art site report — ${t.visits} visits, ${t.buys} buy clicks (last 7 days)`,
         html
       })
     });
