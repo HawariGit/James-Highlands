@@ -405,11 +405,27 @@
     box-shadow:0 30px 80px rgba(0,0,0,.6);
   }
   .lightbox-info{
-    position:absolute;bottom:40px;left:0;right:0;
-    display:flex;flex-direction:column;align-items:center;gap:14px;
+    position:absolute;bottom:0;left:0;right:0;
+    display:flex;flex-direction:column;align-items:center;gap:9px;
+    padding:64px 20px 30px;
+    background:linear-gradient(0deg, rgba(6,6,7,.96) 52%, rgba(6,6,7,.6) 80%, transparent);
   }
   .lightbox-info .title{font-size:18px;letter-spacing:.05em;}
   .lightbox-info .price{color:var(--accent);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:.1em;}
+  .lb-detail{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;letter-spacing:.06em;color:var(--ink-dim);}
+  .lb-sizes{display:flex;gap:8px;}
+  .lb-size{
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:12px;letter-spacing:.1em;
+    padding:7px 16px;
+    background:transparent;border:1px solid var(--ink-dim);
+    color:var(--ink);cursor:pointer;
+    transition:background .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .lb-size:hover{border-color:var(--ink);}
+  .lb-size.active{background:var(--ink);color:#211f1c;border-color:var(--ink);}
+  .lb-quality{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;letter-spacing:.05em;color:var(--ink-dim);min-height:15px;}
+  .lb-quality b{font-weight:600;}
   .lightbox-close{
     position:absolute;top:32px;right:5vw;
     font-size:13px;letter-spacing:.2em;text-transform:uppercase;
@@ -459,19 +475,19 @@
 </div>
 
 <div class="gallery" id="gallery">
-  <div class="g-item g1" data-category="landscape" data-tags="mountain mountains village town houses buildings valley wadi hills rocks cliffs palms trees green terraces landscape scenery" data-title="Mountain Village" data-price="$90" data-img="images/mountain-village.webp">
+  <div class="g-item g1" data-category="landscape" data-tags="mountain mountains village town houses buildings valley wadi hills rocks cliffs palms trees green terraces landscape scenery" data-w="1162" data-h="2048" data-title="Mountain Village" data-price="$90" data-img="images/mountain-village.webp">
     <div class="g-media"><img src="images/mountain-village.webp" alt="Mountain Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Mountain Village</span><span class="g-cat">Landscape</span></div><span class="g-price">$90</span></div>
   </div>
-  <div class="g-item g2" data-category="wildlife" data-tags="bird birds branch blossom blossoms flowers wildlife animal animals nature spring feathers kingfisher wings" data-title="Bird on Branch" data-price="$75" data-img="images/bird-on-branch.webp">
+  <div class="g-item g2" data-category="wildlife" data-tags="bird birds branch blossom blossoms flowers wildlife animal animals nature spring feathers kingfisher wings" data-w="1128" data-h="2048" data-title="Bird on Branch" data-price="$75" data-img="images/bird-on-branch.webp">
     <div class="g-media"><img src="images/bird-on-branch.webp" alt="Bird on Branch" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Bird on Branch</span><span class="g-cat">Wildlife</span></div><span class="g-price">$75</span></div>
   </div>
-  <div class="g-item g6" data-category="botanical" data-tags="flower flowers wildflower wildflowers meadow meadows field poppies daisies garden blooms botanical colorful nature grass floral" data-title="Wildflower Meadow" data-price="$55" data-img="images/wildflower-meadow.webp">
+  <div class="g-item g6" data-category="botanical" data-tags="flower flowers wildflower wildflowers meadow meadows field poppies daisies garden blooms botanical colorful nature grass floral" data-w="1164" data-h="2048" data-title="Wildflower Meadow" data-price="$55" data-img="images/wildflower-meadow.webp">
     <div class="g-media"><img src="images/wildflower-meadow.webp" alt="Wildflower Meadow" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Wildflower Meadow</span><span class="g-cat">Botanical</span></div><span class="g-price">$55</span></div>
   </div>
-  <div class="g-item g7" data-category="interior" data-tags="room chair chairs books book bookshelf shelf shelves interior window library cozy furniture indoors reading study lamp" data-title="The Reading Room" data-price="$65" data-img="images/reading-room.webp">
+  <div class="g-item g7" data-category="interior" data-tags="room chair chairs books book bookshelf shelf shelves interior window library cozy furniture indoors reading study lamp" data-w="810" data-h="1440" data-title="The Reading Room" data-price="$65" data-img="images/reading-room.webp">
     <div class="g-media"><img src="images/reading-room.webp" alt="The Reading Room" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Reading Room</span><span class="g-cat">Interior</span></div><span class="g-price">$65</span></div>
   </div>
@@ -522,6 +538,13 @@
   <div class="lightbox-info">
     <div class="title" id="lightboxTitle"></div>
     <div class="price" id="lightboxPrice"></div>
+    <div class="lb-detail" id="lbDetail"></div>
+    <div class="lb-sizes" id="lbSizes">
+      <button type="button" class="lb-size" data-size="A5">A5</button>
+      <button type="button" class="lb-size active" data-size="A4">A4</button>
+      <button type="button" class="lb-size" data-size="A3">A3</button>
+    </div>
+    <div class="lb-quality" id="lbQuality"></div>
     <a class="btn lightbox-buy" href="mailto:james.highlands.art@outlook.com" id="lightboxBuy">Buy Soft Copy</a>
   </div>
 </div>
@@ -602,9 +625,70 @@
   const lbImg = document.getElementById('lightboxImg');
   const lbTitle = document.getElementById('lightboxTitle');
   const lbPrice = document.getElementById('lightboxPrice');
+  const lbDetail = document.getElementById('lbDetail');
+  const lbSizes = document.getElementById('lbSizes');
+  const lbQuality = document.getElementById('lbQuality');
   const lbBuy = document.getElementById('lightboxBuy');
 
-  let currentPainting = null, currentCategory = null;
+  // A-series paper sizes in inches (short side x long side)
+  const PAPER = { A5:[5.83,8.27], A4:[8.27,11.69], A3:[11.69,16.54] };
+  // only offer a print size if the file prints it at this DPI or better (no soft/stretched prints)
+  const MIN_DPI = 170;
+
+  function dpiFor(size){
+    const [pShort, pLong] = PAPER[size];
+    const short = Math.min(currentW, currentH), long = Math.max(currentW, currentH);
+    return (short && long) ? Math.round(Math.min(short / pShort, long / pLong)) : 0;
+  }
+
+  let currentPainting = null, currentCategory = null, currentPrice = '', currentW = 0, currentH = 0, currentSize = null;
+
+  function updateSize(){
+    const dpi = dpiFor(currentSize);
+    lbQuality.innerHTML = 'At ' + currentSize + ': ~' + dpi + ' DPI · <b style="color:#5aa469">sharp</b>';
+    const body = 'Hi James, I would like to purchase the soft copy file for "' + currentPainting + '" (' + currentPrice + ').'
+      + '\nPreferred print size: ' + currentSize + ' (approx ' + dpi + ' DPI).'
+      + '\nFile resolution: ' + currentW + ' × ' + currentH + ' px.';
+    lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + currentPainting + ' (' + currentSize + ')') + '&body=' + encodeURIComponent(body);
+  }
+
+  function buyNoSize(){
+    const body = 'Hi James, I would like to purchase the soft copy file for "' + currentPainting + '" (' + currentPrice + ').'
+      + '\nFile resolution: ' + currentW + ' × ' + currentH + ' px.';
+    lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + currentPainting) + '&body=' + encodeURIComponent(body);
+  }
+
+  function setupSizes(){
+    // show only sizes this file can print sharply; default to the largest that qualifies
+    let largest = null;
+    lbSizes.querySelectorAll('.lb-size').forEach(b=>{
+      const ok = dpiFor(b.dataset.size) >= MIN_DPI;
+      b.style.display = ok ? '' : 'none';
+      b.classList.remove('active');
+      if (ok) largest = b;
+    });
+    if (largest){
+      lbSizes.style.display = '';
+      largest.classList.add('active');
+      currentSize = largest.dataset.size;
+      updateSize();
+    } else {
+      lbSizes.style.display = 'none';
+      currentSize = null;
+      lbQuality.textContent = 'Digital file — best for on-screen viewing and small prints.';
+      buyNoSize();
+    }
+  }
+
+  lbSizes.querySelectorAll('.lb-size').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      lbSizes.querySelectorAll('.lb-size').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSize = btn.dataset.size;
+      updateSize();
+    });
+  });
+
   items.forEach(item=>{
     item.addEventListener('click', ()=>{
       const title = item.dataset.title;
@@ -612,18 +696,22 @@
       const img = item.dataset.img;
       currentPainting = title;
       currentCategory = item.dataset.category;
+      currentPrice = price;
+      currentW = parseInt(item.dataset.w, 10) || 0;
+      currentH = parseInt(item.dataset.h, 10) || 0;
       lbImg.src = img;
       lbImg.alt = title;
       lbTitle.textContent = title;
       lbPrice.textContent = price + ' — Soft Copy File';
-      lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + title) + '&body=' + encodeURIComponent('Hi James, I would like to purchase the soft copy file for "' + title + '" (' + price + ').');
+      lbDetail.textContent = 'Resolution: ' + currentW + ' × ' + currentH + ' px';
+      setupSizes();
       lightbox.classList.add('open');
       sendTrack({ event: 'click', painting: title, category: item.dataset.category });
     });
   });
 
   // buy-intent: fires when the "Buy Soft Copy" button is clicked
-  lbBuy.addEventListener('click', ()=>{ sendTrack({ event: 'buy', painting: currentPainting, category: currentCategory }); });
+  lbBuy.addEventListener('click', ()=>{ sendTrack({ event: 'buy', painting: currentPainting, category: currentCategory, size: currentSize }); });
 
   document.getElementById('lightboxClose').addEventListener('click', ()=> lightbox.classList.remove('open'));
   lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) lightbox.classList.remove('open'); });
