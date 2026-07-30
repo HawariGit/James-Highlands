@@ -302,7 +302,7 @@
     /* white fill + dark halo so it reads on light and dark areas alike.
        deliberately no mix-blend-mode: it is unreliable inside transformed /
        overflow-hidden containers on mobile Safari, where it vanished. */
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='110'%3E%3Cdefs%3E%3Cfilter id='sh'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='1.4' flood-color='%23000000' flood-opacity='0.75'/%3E%3C/filter%3E%3Cpattern id='wm' width='220' height='110' patternUnits='userSpaceOnUse' patternTransform='rotate(-25)'%3E%3Cg filter='url(%23sh)'%3E%3Ctext x='0' y='30' font-family='Helvetica, Arial, sans-serif' font-size='16' letter-spacing='1.5' fill='%23ffffff' fill-opacity='0.85'%3EJAMES HIGHLANDS ART%3C/text%3E%3Ctext x='110' y='85' font-family='Helvetica, Arial, sans-serif' font-size='16' letter-spacing='1.5' fill='%23ffffff' fill-opacity='0.85'%3EJAMES HIGHLANDS ART%3C/text%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wm)'/%3E%3C/svg%3E");
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='110'%3E%3Cdefs%3E%3Cfilter id='sh'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='1.4' flood-color='%23000000' flood-opacity='0.5'/%3E%3C/filter%3E%3Cpattern id='wm' width='220' height='110' patternUnits='userSpaceOnUse' patternTransform='rotate(-25)'%3E%3Cg filter='url(%23sh)'%3E%3Ctext x='0' y='30' font-family='Helvetica, Arial, sans-serif' font-size='16' letter-spacing='1.5' fill='%23ffffff' fill-opacity='0.6'%3EJAMES HIGHLANDS ART%3C/text%3E%3Ctext x='110' y='85' font-family='Helvetica, Arial, sans-serif' font-size='16' letter-spacing='1.5' fill='%23ffffff' fill-opacity='0.6'%3EJAMES HIGHLANDS ART%3C/text%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wm)'/%3E%3C/svg%3E");
     background-repeat:repeat;
   }
   .g-meta{
@@ -445,17 +445,6 @@
   .lightbox-info .price{color:var(--accent);font-family:'Helvetica Neue',Arial,sans-serif;font-size:13px;letter-spacing:.1em;}
   .lb-detail{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;letter-spacing:.06em;color:var(--ink-dim);}
   .lb-sizes{display:flex;gap:8px;}
-  .lb-orient{display:flex;gap:8px;}
-  /* cropped-orientation preview: shows the exact framing the buyer receives */
-  .lightbox-img-wrap.cropped{
-    aspect-ratio:var(--r);
-    height:min(78vh, calc(82vw / var(--r)));
-  }
-  .lightbox-img-wrap.cropped img{
-    width:100%;height:100%;
-    object-fit:cover;
-    max-width:none;max-height:none;
-  }
   .lb-size{
     font-family:'Helvetica Neue',Arial,sans-serif;
     font-size:12px;letter-spacing:.1em;
@@ -542,7 +531,7 @@
     <div class="g-media"><img src="images/reading-room.webp" alt="The Reading Room" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Reading Room</span><span class="g-cat">Interior</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="village mountains green fields palms plain valley houses distant peaks oman" data-w="5760" data-h="3240" data-alt="1" data-title="Green Plain Village" data-price="$10" data-img="images/oman/oman-01-green-plain-village.webp">
+  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="village mountains green fields palms plain valley houses distant peaks oman" data-w="5760" data-h="3240" data-title="Green Plain Village" data-price="$10" data-img="images/oman/oman-01-green-plain-village.webp">
     <div class="g-media"><img src="images/oman/oman-01-green-plain-village.webp" alt="Green Plain Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Green Plain Village</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
@@ -554,7 +543,7 @@
     <div class="g-media"><img src="images/oman/oman-03-palm-in-the-alley.webp" alt="Palm in the Alley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Palm in the Alley</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="falaj water channel irrigation palms wall path stone village green oman" data-w="3240" data-h="5760" data-alt="1" data-title="The Falaj Path" data-price="$10" data-img="images/oman/oman-04-the-falaj-path.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="falaj water channel irrigation palms wall path stone village green oman" data-w="3240" data-h="5760" data-title="The Falaj Path" data-price="$10" data-img="images/oman/oman-04-the-falaj-path.webp">
     <div class="g-media"><img src="images/oman/oman-04-the-falaj-path.webp" alt="The Falaj Path" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Falaj Path</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
@@ -562,11 +551,11 @@
     <div class="g-media"><img src="images/oman/oman-05-lone-date-palm.webp" alt="Lone Date Palm" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Lone Date Palm</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="palms village mountains ridge dry grass houses mudbrick hills oman" data-w="3240" data-h="5760" data-alt="1" data-title="Village Under the Ridge" data-price="$10" data-img="images/oman/oman-06-village-under-the-ridge.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="palms village mountains ridge dry grass houses mudbrick hills oman" data-w="3240" data-h="5760" data-title="Village Under the Ridge" data-price="$10" data-img="images/oman/oman-06-village-under-the-ridge.webp">
     <div class="g-media"><img src="images/oman/oman-06-village-under-the-ridge.webp" alt="Village Under the Ridge" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village Under the Ridge</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="palm grove palms village mountains houses trees green oman" data-w="3240" data-h="5760" data-alt="1" data-title="Palm Grove Village" data-price="$10" data-img="images/oman/oman-07-palm-grove-village.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="palm grove palms village mountains houses trees green oman" data-w="3240" data-h="5760" data-title="Palm Grove Village" data-price="$10" data-img="images/oman/oman-07-palm-grove-village.webp">
     <div class="g-media"><img src="images/oman/oman-07-palm-grove-village.webp" alt="Palm Grove Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Palm Grove Village</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
@@ -574,7 +563,7 @@
     <div class="g-media"><img src="images/oman/oman-08-fort-by-the-water.webp" alt="Fort by the Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Fort by the Water</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="houses terraces village palms mountains mudbrick hillside oman" data-w="3240" data-h="5760" data-alt="1" data-title="Terraced Houses" data-price="$10" data-img="images/oman/oman-09-terraced-houses.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="houses terraces village palms mountains mudbrick hillside oman" data-w="3240" data-h="5760" data-title="Terraced Houses" data-price="$10" data-img="images/oman/oman-09-terraced-houses.webp">
     <div class="g-media"><img src="images/oman/oman-09-terraced-houses.webp" alt="Terraced Houses" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Terraced Houses</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
@@ -582,11 +571,11 @@
     <div class="g-media"><img src="images/oman/oman-10-watchtowers-above-the-wadi.webp" alt="Watchtowers Above the Wadi" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Watchtowers Above the Wadi</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="alley shadows sunlight tree village mudbrick walls blue sky street oman" data-w="3240" data-h="5760" data-alt="1" data-title="Morning Shadows" data-price="$10" data-img="images/oman/oman-11-morning-shadows.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="alley shadows sunlight tree village mudbrick walls blue sky street oman" data-w="3240" data-h="5760" data-title="Morning Shadows" data-price="$10" data-img="images/oman/oman-11-morning-shadows.webp">
     <div class="g-media"><img src="images/oman/oman-11-morning-shadows.webp" alt="Morning Shadows" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Morning Shadows</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="mist fog mountains trees stream wadi rocks muted quiet oman" data-w="3240" data-h="5760" data-alt="1" data-title="Mist Over the Wadi" data-price="$10" data-img="images/oman/oman-12-mist-over-the-wadi.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="mist fog mountains trees stream wadi rocks muted quiet oman" data-w="3240" data-h="5760" data-title="Mist Over the Wadi" data-price="$10" data-img="images/oman/oman-12-mist-over-the-wadi.webp">
     <div class="g-media"><img src="images/oman/oman-12-mist-over-the-wadi.webp" alt="Mist Over the Wadi" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Mist Over the Wadi</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
@@ -598,131 +587,131 @@
     <div class="g-media"><img src="images/oman/oman-14-the-minaret-street.webp" alt="The Minaret Street" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Minaret Street</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="mountains water reflection palms village calm lake panorama oman" data-w="5760" data-h="3240" data-alt="1" data-title="Still Water, Distant Peaks" data-price="$10" data-img="images/oman/oman-15-still-water-distant-peaks.webp">
+  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="mountains water reflection palms village calm lake panorama oman" data-w="5760" data-h="3240" data-title="Still Water, Distant Peaks" data-price="$10" data-img="images/oman/oman-15-still-water-distant-peaks.webp">
     <div class="g-media"><img src="images/oman/oman-15-still-water-distant-peaks.webp" alt="Still Water, Distant Peaks" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Still Water, Distant Peaks</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="mountains village palms houses hills panorama valley oman" data-w="5760" data-h="3240" data-alt="1" data-title="Village Beneath the Mountains" data-price="$10" data-img="images/oman/oman-16-village-beneath-the-mountains.webp">
+  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="mountains village palms houses hills panorama valley oman" data-w="5760" data-h="3240" data-title="Village Beneath the Mountains" data-price="$10" data-img="images/oman/oman-16-village-beneath-the-mountains.webp">
     <div class="g-media"><img src="images/oman/oman-16-village-beneath-the-mountains.webp" alt="Village Beneath the Mountains" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village Beneath the Mountains</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="village reflection water mountains palms calm mirror houses oman" data-w="5760" data-h="3240" data-alt="1" data-title="Mirror of the Village" data-price="$10" data-img="images/oman/oman-17-mirror-of-the-village.webp">
+  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="village reflection water mountains palms calm mirror houses oman" data-w="5760" data-h="3240" data-title="Mirror of the Village" data-price="$10" data-img="images/oman/oman-17-mirror-of-the-village.webp">
     <div class="g-media"><img src="images/oman/oman-17-mirror-of-the-village.webp" alt="Mirror of the Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Mirror of the Village</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="village green water mountains palms reflection houses shore oman" data-w="5760" data-h="3240" data-alt="1" data-title="Village on the Green Water" data-price="$10" data-img="images/oman/oman-18-village-on-the-green-water.webp">
+  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="village green water mountains palms reflection houses shore oman" data-w="5760" data-h="3240" data-title="Village on the Green Water" data-price="$10" data-img="images/oman/oman-18-village-on-the-green-water.webp">
     <div class="g-media"><img src="images/oman/oman-18-village-on-the-green-water.webp" alt="Village on the Green Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village on the Green Water</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="village reflection water panorama mountains palms calm still oman" data-w="5760" data-h="3240" data-alt="1" data-title="Long Reflection" data-price="$10" data-img="images/oman/oman-19-long-reflection.webp">
+  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="village reflection water panorama mountains palms calm still oman" data-w="5760" data-h="3240" data-title="Long Reflection" data-price="$10" data-img="images/oman/oman-19-long-reflection.webp">
     <div class="g-media"><img src="images/oman/oman-19-long-reflection.webp" alt="Long Reflection" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Long Reflection</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="white houses water reflection mountains village palms shore oman" data-w="5760" data-h="3240" data-alt="1" data-title="White Houses by the Water" data-price="$10" data-img="images/oman/oman-20-white-houses-by-the-water.webp">
+  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="white houses water reflection mountains village palms shore oman" data-w="5760" data-h="3240" data-title="White Houses by the Water" data-price="$10" data-img="images/oman/oman-20-white-houses-by-the-water.webp">
     <div class="g-media"><img src="images/oman/oman-20-white-houses-by-the-water.webp" alt="White Houses by the Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">White Houses by the Water</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village pool water reflection figures people cliff houses evening oman" data-w="3240" data-h="5760" data-alt="1" data-title="Evening at the Pool" data-price="$10" data-img="images/oman/oman-21-evening-at-the-pool.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village pool water reflection figures people cliff houses evening oman" data-w="3240" data-h="5760" data-title="Evening at the Pool" data-price="$10" data-img="images/oman/oman-21-evening-at-the-pool.webp">
     <div class="g-media"><img src="images/oman/oman-21-evening-at-the-pool.webp" alt="Evening at the Pool" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Evening at the Pool</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="golden ochre village sunset warm reflection water palms houses oman" data-w="3240" data-h="5760" data-alt="1" data-title="Golden Village" data-price="$10" data-img="images/oman/oman-22-golden-village.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="golden ochre village sunset warm reflection water palms houses oman" data-w="3240" data-h="5760" data-title="Golden Village" data-price="$10" data-img="images/oman/oman-22-golden-village.webp">
     <div class="g-media"><img src="images/oman/oman-22-golden-village.webp" alt="Golden Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Golden Village</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="turquoise water village reflection mountains houses cliff blue oman" data-w="3240" data-h="5760" data-alt="1" data-title="Turquoise Reflections" data-price="$10" data-img="images/oman/oman-23-turquoise-reflections.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="turquoise water village reflection mountains houses cliff blue oman" data-w="3240" data-h="5760" data-title="Turquoise Reflections" data-price="$10" data-img="images/oman/oman-23-turquoise-reflections.webp">
     <div class="g-media"><img src="images/oman/oman-23-turquoise-reflections.webp" alt="Turquoise Reflections" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Turquoise Reflections</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="house pool turquoise water rocks cliff village boulders oman" data-w="3240" data-h="5760" data-alt="1" data-title="House Above the Pool" data-price="$10" data-img="images/oman/oman-24-house-above-the-pool.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="house pool turquoise water rocks cliff village boulders oman" data-w="3240" data-h="5760" data-title="House Above the Pool" data-price="$10" data-img="images/oman/oman-24-house-above-the-pool.webp">
     <div class="g-media"><img src="images/oman/oman-24-house-above-the-pool.webp" alt="House Above the Pool" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">House Above the Pool</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="white village reflection still water mountains houses hillside oman" data-w="3240" data-h="5760" data-alt="1" data-title="White Village, Still Water" data-price="$10" data-img="images/oman/oman-25-white-village-still-water.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="white village reflection still water mountains houses hillside oman" data-w="3240" data-h="5760" data-title="White Village, Still Water" data-price="$10" data-img="images/oman/oman-25-white-village-still-water.webp">
     <div class="g-media"><img src="images/oman/oman-25-white-village-still-water.webp" alt="White Village, Still Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">White Village, Still Water</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="figures people shore water village white houses palms blue oman" data-w="3240" data-h="5760" data-alt="1" data-title="Gathering by the Water" data-price="$10" data-img="images/oman/oman-26-gathering-by-the-water.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="figures people shore water village white houses palms blue oman" data-w="3240" data-h="5760" data-title="Gathering by the Water" data-price="$10" data-img="images/oman/oman-26-gathering-by-the-water.webp">
     <div class="g-media"><img src="images/oman/oman-26-gathering-by-the-water.webp" alt="Gathering by the Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Gathering by the Water</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="aerial above village rooftops dry valley houses mudbrick hills oman" data-w="3240" data-h="5760" data-alt="1" data-title="Village from Above" data-price="$10" data-img="images/oman/oman-27-village-from-above.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="aerial above village rooftops dry valley houses mudbrick hills oman" data-w="3240" data-h="5760" data-title="Village from Above" data-price="$10" data-img="images/oman/oman-27-village-from-above.webp">
     <div class="g-media"><img src="images/oman/oman-27-village-from-above.webp" alt="Village from Above" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village from Above</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="green valley houses stream water hills terraces village oman" data-w="3240" data-h="5760" data-alt="1" data-title="Green Valley Homes" data-price="$10" data-img="images/oman/oman-28-green-valley-homes.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="green valley houses stream water hills terraces village oman" data-w="3240" data-h="5760" data-title="Green Valley Homes" data-price="$10" data-img="images/oman/oman-28-green-valley-homes.webp">
     <div class="g-media"><img src="images/oman/oman-28-green-valley-homes.webp" alt="Green Valley Homes" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Green Valley Homes</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="rocks boulders gorge dry houses cliff path descent stone oman" data-w="3240" data-h="5760" data-alt="1" data-title="Rocky Descent" data-price="$10" data-img="images/oman/oman-29-rocky-descent.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="rocks boulders gorge dry houses cliff path descent stone oman" data-w="3240" data-h="5760" data-title="Rocky Descent" data-price="$10" data-img="images/oman/oman-29-rocky-descent.webp">
     <div class="g-media"><img src="images/oman/oman-29-rocky-descent.webp" alt="Rocky Descent" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Rocky Descent</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="emerald green water village mountains bend river houses palms oman" data-w="5760" data-h="3240" data-alt="1" data-title="The Emerald Bend" data-price="$10" data-img="images/oman/oman-30-the-emerald-bend.webp">
+  <div class="g-item gl" data-category="villages" data-region="oman" data-tags="emerald green water village mountains bend river houses palms oman" data-w="5760" data-h="3240" data-title="The Emerald Bend" data-price="$10" data-img="images/oman/oman-30-the-emerald-bend.webp">
     <div class="g-media"><img src="images/oman/oman-30-the-emerald-bend.webp" alt="The Emerald Bend" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Emerald Bend</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="desert village mountains dry sand houses hills panorama oman" data-w="5760" data-h="3240" data-alt="1" data-title="Desert Village" data-price="$10" data-img="images/oman/oman-31-desert-village.webp">
+  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="desert village mountains dry sand houses hills panorama oman" data-w="5760" data-h="3240" data-title="Desert Village" data-price="$10" data-img="images/oman/oman-31-desert-village.webp">
     <div class="g-media"><img src="images/oman/oman-31-desert-village.webp" alt="Desert Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Desert Village</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="canyon pool green water cliffs narrow gorge rocks oman" data-w="3240" data-h="5760" data-alt="1" data-title="Canyon Pool" data-price="$10" data-img="images/oman/oman-32-canyon-pool.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="canyon pool green water cliffs narrow gorge rocks oman" data-w="3240" data-h="5760" data-title="Canyon Pool" data-price="$10" data-img="images/oman/oman-32-canyon-pool.webp">
     <div class="g-media"><img src="images/oman/oman-32-canyon-pool.webp" alt="Canyon Pool" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Canyon Pool</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="palms pool green water rocks boulders mountains wadi oman" data-w="3240" data-h="5760" data-alt="1" data-title="Palms by the Pool" data-price="$10" data-img="images/oman/oman-33-palms-by-the-pool.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="palms pool green water rocks boulders mountains wadi oman" data-w="3240" data-h="5760" data-title="Palms by the Pool" data-price="$10" data-img="images/oman/oman-33-palms-by-the-pool.webp">
     <div class="g-media"><img src="images/oman/oman-33-palms-by-the-pool.webp" alt="Palms by the Pool" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Palms by the Pool</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="winding river wadi canyon cliffs water green rocks oman" data-w="3240" data-h="5760" data-alt="1" data-title="The Winding Wadi" data-price="$10" data-img="images/oman/oman-34-the-winding-wadi.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="winding river wadi canyon cliffs water green rocks oman" data-w="3240" data-h="5760" data-title="The Winding Wadi" data-price="$10" data-img="images/oman/oman-34-the-winding-wadi.webp">
     <div class="g-media"><img src="images/oman/oman-34-the-winding-wadi.webp" alt="The Winding Wadi" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Winding Wadi</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="boulders palms village mountains rocks wadi green oman" data-w="3240" data-h="5760" data-alt="1" data-title="Boulders and Palms" data-price="$10" data-img="images/oman/oman-35-boulders-and-palms.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="boulders palms village mountains rocks wadi green oman" data-w="3240" data-h="5760" data-title="Boulders and Palms" data-price="$10" data-img="images/oman/oman-35-boulders-and-palms.webp">
     <div class="g-media"><img src="images/oman/oman-35-boulders-and-palms.webp" alt="Boulders and Palms" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Boulders and Palms</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="cliff village houses misty mountains mudbrick stacked hillside oman" data-w="3240" data-h="5760" data-alt="1" data-title="Cliffside Village" data-price="$10" data-img="images/oman/oman-36-cliffside-village.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="cliff village houses misty mountains mudbrick stacked hillside oman" data-w="3240" data-h="5760" data-title="Cliffside Village" data-price="$10" data-img="images/oman/oman-36-cliffside-village.webp">
     <div class="g-media"><img src="images/oman/oman-36-cliffside-village.webp" alt="Cliffside Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Cliffside Village</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village blue valley mountains houses mist cliff oman" data-w="3240" data-h="5760" data-alt="1" data-title="Village in the Blue Valley" data-price="$10" data-img="images/oman/oman-37-village-in-the-blue-valley.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village blue valley mountains houses mist cliff oman" data-w="3240" data-h="5760" data-title="Village in the Blue Valley" data-price="$10" data-img="images/oman/oman-37-village-in-the-blue-valley.webp">
     <div class="g-media"><img src="images/oman/oman-37-village-in-the-blue-valley.webp" alt="Village in the Blue Valley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village in the Blue Valley</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="fort tower hill village palms mudbrick ruins stone oman" data-w="3240" data-h="5760" data-alt="1" data-title="The Old Fort" data-price="$10" data-img="images/oman/oman-38-the-old-fort.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="fort tower hill village palms mudbrick ruins stone oman" data-w="3240" data-h="5760" data-title="The Old Fort" data-price="$10" data-img="images/oman/oman-38-the-old-fort.webp">
     <div class="g-media"><img src="images/oman/oman-38-the-old-fort.webp" alt="The Old Fort" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Old Fort</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="valley wide mountains terraces fields green cliffs oman" data-w="3240" data-h="5760" data-alt="1" data-title="The Wide Valley" data-price="$10" data-img="images/oman/oman-39-the-wide-valley.webp">
+  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="valley wide mountains terraces fields green cliffs oman" data-w="3240" data-h="5760" data-title="The Wide Valley" data-price="$10" data-img="images/oman/oman-39-the-wide-valley.webp">
     <div class="g-media"><img src="images/oman/oman-39-the-wide-valley.webp" alt="The Wide Valley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Wide Valley</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="path gorge canyon palms green cliffs trail rocks oman" data-w="3240" data-h="5760" data-alt="1" data-title="Path Through the Gorge" data-price="$10" data-img="images/oman/oman-40-path-through-the-gorge.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="path gorge canyon palms green cliffs trail rocks oman" data-w="3240" data-h="5760" data-title="Path Through the Gorge" data-price="$10" data-img="images/oman/oman-40-path-through-the-gorge.webp">
     <div class="g-media"><img src="images/oman/oman-40-path-through-the-gorge.webp" alt="Path Through the Gorge" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Path Through the Gorge</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="mist morning valley village palms mountains fog oman" data-w="3240" data-h="5760" data-alt="1" data-title="Morning Mist in the Valley" data-price="$10" data-img="images/oman/oman-41-morning-mist-in-the-valley.webp">
+  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="mist morning valley village palms mountains fog oman" data-w="3240" data-h="5760" data-title="Morning Mist in the Valley" data-price="$10" data-img="images/oman/oman-41-morning-mist-in-the-valley.webp">
     <div class="g-media"><img src="images/oman/oman-41-morning-mist-in-the-valley.webp" alt="Morning Mist in the Valley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Morning Mist in the Valley</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="wadi pool green water houses rocks stream cliffs oman" data-w="3240" data-h="5760" data-alt="1" data-title="Wadi Pool" data-price="$10" data-img="images/oman/oman-42-wadi-pool.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="wadi pool green water houses rocks stream cliffs oman" data-w="3240" data-h="5760" data-title="Wadi Pool" data-price="$10" data-img="images/oman/oman-42-wadi-pool.webp">
     <div class="g-media"><img src="images/oman/oman-42-wadi-pool.webp" alt="Wadi Pool" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Wadi Pool</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="canyon walls narrow tall cliffs blue sky gorge rocks oman" data-w="3240" data-h="5760" data-alt="1" data-title="Between the Walls" data-price="$10" data-img="images/oman/oman-43-between-the-walls.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="canyon walls narrow tall cliffs blue sky gorge rocks oman" data-w="3240" data-h="5760" data-title="Between the Walls" data-price="$10" data-img="images/oman/oman-43-between-the-walls.webp">
     <div class="g-media"><img src="images/oman/oman-43-between-the-walls.webp" alt="Between the Walls" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Between the Walls</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="turquoise water channel canyon cliffs rocks stream oman" data-w="3240" data-h="5760" data-alt="1" data-title="Turquoise Channel" data-price="$10" data-img="images/oman/oman-44-turquoise-channel.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="turquoise water channel canyon cliffs rocks stream oman" data-w="3240" data-h="5760" data-title="Turquoise Channel" data-price="$10" data-img="images/oman/oman-44-turquoise-channel.webp">
     <div class="g-media"><img src="images/oman/oman-44-turquoise-channel.webp" alt="Turquoise Channel" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Turquoise Channel</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village dome mosque hillside misty houses mudbrick oman" data-w="3240" data-h="5760" data-alt="1" data-title="Village and Dome" data-price="$10" data-img="images/oman/oman-45-village-and-dome.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village dome mosque hillside misty houses mudbrick oman" data-w="3240" data-h="5760" data-title="Village and Dome" data-price="$10" data-img="images/oman/oman-45-village-and-dome.webp">
     <div class="g-media"><img src="images/oman/oman-45-village-and-dome.webp" alt="Village and Dome" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village and Dome</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village peaks dome mosque mist mountains houses palms oman" data-w="3240" data-h="5760" data-alt="1" data-title="Beneath the Peaks" data-price="$10" data-img="images/oman/oman-46-beneath-the-peaks.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="village peaks dome mosque mist mountains houses palms oman" data-w="3240" data-h="5760" data-title="Beneath the Peaks" data-price="$10" data-img="images/oman/oman-46-beneath-the-peaks.webp">
     <div class="g-media"><img src="images/oman/oman-46-beneath-the-peaks.webp" alt="Beneath the Peaks" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Beneath the Peaks</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
@@ -730,67 +719,67 @@
     <div class="g-media"><img src="images/oman/oman-47-fort-on-the-hill.webp" alt="Fort on the Hill" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Fort on the Hill</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="green water red rock canyon palms cliffs stream oman" data-w="3240" data-h="5760" data-alt="1" data-title="Green Water, Red Rock" data-price="$10" data-img="images/oman/oman-48-green-water-red-rock.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="green water red rock canyon palms cliffs stream oman" data-w="3240" data-h="5760" data-title="Green Water, Red Rock" data-price="$10" data-img="images/oman/oman-48-green-water-red-rock.webp">
     <div class="g-media"><img src="images/oman/oman-48-green-water-red-rock.webp" alt="Green Water, Red Rock" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Green Water, Red Rock</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="river canyon above green water rocks cliffs gorge oman" data-w="3240" data-h="5760" data-alt="1" data-title="The River Below" data-price="$10" data-img="images/oman/oman-49-the-river-below.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="river canyon above green water rocks cliffs gorge oman" data-w="3240" data-h="5760" data-title="The River Below" data-price="$10" data-img="images/oman/oman-49-the-river-below.webp">
     <div class="g-media"><img src="images/oman/oman-49-the-river-below.webp" alt="The River Below" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The River Below</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="deep gorge canyon dark cliffs stream narrow rocks oman" data-w="3008" data-h="5568" data-alt="1" data-title="Deep Gorge" data-price="$10" data-img="images/oman/oman-50-deep-gorge.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="deep gorge canyon dark cliffs stream narrow rocks oman" data-w="3008" data-h="5568" data-title="Deep Gorge" data-price="$10" data-img="images/oman/oman-50-deep-gorge.webp">
     <div class="g-media"><img src="images/oman/oman-50-deep-gorge.webp" alt="Deep Gorge" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Deep Gorge</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="village cliff stream torrent water mountains blue rocks oman" data-w="3240" data-h="5760" data-alt="1" data-title="Above the Torrent" data-price="$10" data-img="images/oman/oman-51-above-the-torrent.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="village cliff stream torrent water mountains blue rocks oman" data-w="3240" data-h="5760" data-title="Above the Torrent" data-price="$10" data-img="images/oman/oman-51-above-the-torrent.webp">
     <div class="g-media"><img src="images/oman/oman-51-above-the-torrent.webp" alt="Above the Torrent" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Above the Torrent</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="dry riverbed valley village hills sand wide oman" data-w="3240" data-h="5760" data-alt="1" data-title="Dry Riverbed" data-price="$10" data-img="images/oman/oman-52-dry-riverbed.webp">
+  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="dry riverbed valley village hills sand wide oman" data-w="3240" data-h="5760" data-title="Dry Riverbed" data-price="$10" data-img="images/oman/oman-52-dry-riverbed.webp">
     <div class="g-media"><img src="images/oman/oman-52-dry-riverbed.webp" alt="Dry Riverbed" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Dry Riverbed</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="turquoise water river rocks flow stream clear oman" data-w="3240" data-h="5760" data-alt="1" data-title="Turquoise Flow" data-price="$10" data-img="images/oman/oman-53-turquoise-flow.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="turquoise water river rocks flow stream clear oman" data-w="3240" data-h="5760" data-title="Turquoise Flow" data-price="$10" data-img="images/oman/oman-53-turquoise-flow.webp">
     <div class="g-media"><img src="images/oman/oman-53-turquoise-flow.webp" alt="Turquoise Flow" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Turquoise Flow</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="palm river water hills green stream bank oman" data-w="3240" data-h="5760" data-alt="1" data-title="Palm at the River" data-price="$10" data-img="images/oman/oman-54-palm-at-the-river.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="palm river water hills green stream bank oman" data-w="3240" data-h="5760" data-title="Palm at the River" data-price="$10" data-img="images/oman/oman-54-palm-at-the-river.webp">
     <div class="g-media"><img src="images/oman/oman-54-palm-at-the-river.webp" alt="Palm at the River" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Palm at the River</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="white houses lagoon blue turquoise water rocks village oman" data-w="3240" data-h="5760" data-alt="1" data-title="White Houses, Blue Lagoon" data-price="$10" data-img="images/oman/oman-55-white-houses-blue-lagoon.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="white houses lagoon blue turquoise water rocks village oman" data-w="3240" data-h="5760" data-title="White Houses, Blue Lagoon" data-price="$10" data-img="images/oman/oman-55-white-houses-blue-lagoon.webp">
     <div class="g-media"><img src="images/oman/oman-55-white-houses-blue-lagoon.webp" alt="White Houses, Blue Lagoon" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">White Houses, Blue Lagoon</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="ochre village hill people figures mudbrick houses palms oman" data-w="3240" data-h="5760" data-alt="1" data-title="Ochre Village" data-price="$10" data-img="images/oman/oman-56-ochre-village.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="ochre village hill people figures mudbrick houses palms oman" data-w="3240" data-h="5760" data-title="Ochre Village" data-price="$10" data-img="images/oman/oman-56-ochre-village.webp">
     <div class="g-media"><img src="images/oman/oman-56-ochre-village.webp" alt="Ochre Village" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Ochre Village</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="stacked houses mudbrick palms village windows terraces oman" data-w="3240" data-h="5760" data-alt="1" data-title="Stacked Houses" data-price="$10" data-img="images/oman/oman-57-stacked-houses.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="stacked houses mudbrick palms village windows terraces oman" data-w="3240" data-h="5760" data-title="Stacked Houses" data-price="$10" data-img="images/oman/oman-57-stacked-houses.webp">
     <div class="g-media"><img src="images/oman/oman-57-stacked-houses.webp" alt="Stacked Houses" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Stacked Houses</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="old quarter mudbrick houses palms cliff village large oman" data-w="3240" data-h="5760" data-alt="1" data-title="The Old Quarter" data-price="$10" data-img="images/oman/oman-58-the-old-quarter.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="old quarter mudbrick houses palms cliff village large oman" data-w="3240" data-h="5760" data-title="The Old Quarter" data-price="$10" data-img="images/oman/oman-58-the-old-quarter.webp">
     <div class="g-media"><img src="images/oman/oman-58-the-old-quarter.webp" alt="The Old Quarter" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Old Quarter</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="tower canyon turquoise pool cliffs palms rocks oman" data-w="3240" data-h="5760" data-alt="1" data-title="Tower Over the Pool" data-price="$10" data-img="images/oman/oman-59-tower-over-the-pool.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="tower canyon turquoise pool cliffs palms rocks oman" data-w="3240" data-h="5760" data-title="Tower Over the Pool" data-price="$10" data-img="images/oman/oman-59-tower-over-the-pool.webp">
     <div class="g-media"><img src="images/oman/oman-59-tower-over-the-pool.webp" alt="Tower Over the Pool" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Tower Over the Pool</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="blue river valley mountains green fields winding oman" data-w="3240" data-h="5760" data-alt="1" data-title="Blue River Valley" data-price="$10" data-img="images/oman/oman-60-blue-river-valley.webp">
+  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="blue river valley mountains green fields winding oman" data-w="3240" data-h="5760" data-title="Blue River Valley" data-price="$10" data-img="images/oman/oman-60-blue-river-valley.webp">
     <div class="g-media"><img src="images/oman/oman-60-blue-river-valley.webp" alt="Blue River Valley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Blue River Valley</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="canyon overlook above cliffs green rocks deep oman" data-w="3240" data-h="5760" data-alt="1" data-title="Canyon Overlook" data-price="$10" data-img="images/oman/oman-61-canyon-overlook.webp">
+  <div class="g-item gp" data-category="wadis" data-region="oman" data-tags="canyon overlook above cliffs green rocks deep oman" data-w="3240" data-h="5760" data-title="Canyon Overlook" data-price="$10" data-img="images/oman/oman-61-canyon-overlook.webp">
     <div class="g-media"><img src="images/oman/oman-61-canyon-overlook.webp" alt="Canyon Overlook" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Canyon Overlook</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="terraces fields valley mountains green farming steps oman" data-w="3240" data-h="5760" data-alt="1" data-title="The Terraces" data-price="$10" data-img="images/oman/oman-62-the-terraces.webp">
+  <div class="g-item gp" data-category="mountains" data-region="oman" data-tags="terraces fields valley mountains green farming steps oman" data-w="3240" data-h="5760" data-title="The Terraces" data-price="$10" data-img="images/oman/oman-62-the-terraces.webp">
     <div class="g-media"><img src="images/oman/oman-62-the-terraces.webp" alt="The Terraces" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Terraces</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="stone houses rocky slope mountains village cliff oman" data-w="3240" data-h="5760" data-alt="1" data-title="Stone Houses" data-price="$10" data-img="images/oman/oman-63-stone-houses.webp">
+  <div class="g-item gp" data-category="villages" data-region="oman" data-tags="stone houses rocky slope mountains village cliff oman" data-w="3240" data-h="5760" data-title="Stone Houses" data-price="$10" data-img="images/oman/oman-63-stone-houses.webp">
     <div class="g-media"><img src="images/oman/oman-63-stone-houses.webp" alt="Stone Houses" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Stone Houses</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
@@ -802,51 +791,51 @@
     <div class="g-media"><img src="images/oman/oman-65-tall-walls-and-palms.webp" alt="Tall Walls and Palms" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Tall Walls and Palms</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="wadis" data-region="oman" data-tags="pale rocks white stone village riverbed dry water oman" data-w="5760" data-h="3240" data-alt="1" data-title="Pale Rocks" data-price="$10" data-img="images/oman/oman-66-pale-rocks.webp">
+  <div class="g-item gl" data-category="wadis" data-region="oman" data-tags="pale rocks white stone village riverbed dry water oman" data-w="5760" data-h="3240" data-title="Pale Rocks" data-price="$10" data-img="images/oman/oman-66-pale-rocks.webp">
     <div class="g-media"><img src="images/oman/oman-66-pale-rocks.webp" alt="Pale Rocks" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Pale Rocks</span><span class="g-cat">wadis</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="sea beach turquoise waves mountains boats sailing shore coast oman" data-w="5760" data-h="3240" data-alt="1" data-title="Sea and Mountain" data-price="$10" data-img="images/oman/oman-67-sea-and-mountain.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="sea beach turquoise waves mountains boats sailing shore coast oman" data-w="5760" data-h="3240" data-title="Sea and Mountain" data-price="$10" data-img="images/oman/oman-67-sea-and-mountain.webp">
     <div class="g-media"><img src="images/oman/oman-67-sea-and-mountain.webp" alt="Sea and Mountain" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Sea and Mountain</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="rocky cove turquoise water cliffs sea shore rocks oman" data-w="5760" data-h="3240" data-alt="1" data-title="Rocky Cove" data-price="$10" data-img="images/oman/oman-68-rocky-cove.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="rocky cove turquoise water cliffs sea shore rocks oman" data-w="5760" data-h="3240" data-title="Rocky Cove" data-price="$10" data-img="images/oman/oman-68-rocky-cove.webp">
     <div class="g-media"><img src="images/oman/oman-68-rocky-cove.webp" alt="Rocky Cove" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Rocky Cove</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="beach long sand sea people headland shore waves oman" data-w="5760" data-h="3240" data-alt="1" data-title="The Long Beach" data-price="$10" data-img="images/oman/oman-69-the-long-beach.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="beach long sand sea people headland shore waves oman" data-w="5760" data-h="3240" data-title="The Long Beach" data-price="$10" data-img="images/oman/oman-69-the-long-beach.webp">
     <div class="g-media"><img src="images/oman/oman-69-the-long-beach.webp" alt="The Long Beach" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Long Beach</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="harbour town minaret dhow boat birds sea rocks white houses oman" data-w="5760" data-h="3240" data-alt="1" data-title="Harbour Town" data-price="$10" data-img="images/oman/oman-70-harbour-town.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="harbour town minaret dhow boat birds sea rocks white houses oman" data-w="5760" data-h="3240" data-title="Harbour Town" data-price="$10" data-img="images/oman/oman-70-harbour-town.webp">
     <div class="g-media"><img src="images/oman/oman-70-harbour-town.webp" alt="Harbour Town" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Harbour Town</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="corniche promenade dhow boats sea mountains muttrah walk town oman" data-w="5760" data-h="3240" data-alt="1" data-title="The Corniche" data-price="$10" data-img="images/oman/oman-71-the-corniche.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="corniche promenade dhow boats sea mountains muttrah walk town oman" data-w="5760" data-h="3240" data-title="The Corniche" data-price="$10" data-img="images/oman/oman-71-the-corniche.webp">
     <div class="g-media"><img src="images/oman/oman-71-the-corniche.webp" alt="The Corniche" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Corniche</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="village shore beach mountains sea white houses trees oman" data-w="5760" data-h="3240" data-alt="1" data-title="Village on the Shore" data-price="$10" data-img="images/oman/oman-72-village-on-the-shore.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="village shore beach mountains sea white houses trees oman" data-w="5760" data-h="3240" data-title="Village on the Shore" data-price="$10" data-img="images/oman/oman-72-village-on-the-shore.webp">
     <div class="g-media"><img src="images/oman/oman-72-village-on-the-shore.webp" alt="Village on the Shore" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Village on the Shore</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="flamingos birds wildlife shallow water tide boat huts shore pink oman" data-w="5760" data-h="3240" data-alt="1" data-title="Flamingos at Low Tide" data-price="$10" data-img="images/oman/oman-73-flamingos-at-low-tide.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="flamingos birds wildlife shallow water tide boat huts shore pink oman" data-w="5760" data-h="3240" data-title="Flamingos at Low Tide" data-price="$10" data-img="images/oman/oman-73-flamingos-at-low-tide.webp">
     <div class="g-media"><img src="images/oman/oman-73-flamingos-at-low-tide.webp" alt="Flamingos at Low Tide" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Flamingos at Low Tide</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="sunset harbour orange white houses boats figures sea glow oman" data-w="5760" data-h="3240" data-alt="1" data-title="Sunset Harbour" data-price="$10" data-img="images/oman/oman-74-sunset-harbour.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="sunset harbour orange white houses boats figures sea glow oman" data-w="5760" data-h="3240" data-title="Sunset Harbour" data-price="$10" data-img="images/oman/oman-74-sunset-harbour.webp">
     <div class="g-media"><img src="images/oman/oman-74-sunset-harbour.webp" alt="Sunset Harbour" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Sunset Harbour</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="fort sea shore calm water mountains stone tower oman" data-w="5760" data-h="3240" data-alt="1" data-title="Fort by the Sea" data-price="$10" data-img="images/oman/oman-75-fort-by-the-sea.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="fort sea shore calm water mountains stone tower oman" data-w="5760" data-h="3240" data-title="Fort by the Sea" data-price="$10" data-img="images/oman/oman-75-fort-by-the-sea.webp">
     <div class="g-media"><img src="images/oman/oman-75-fort-by-the-sea.webp" alt="Fort by the Sea" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Fort by the Sea</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="pink purple sunset evening shore village figures sea oman" data-w="5760" data-h="3240" data-alt="1" data-title="Pink Evening" data-price="$10" data-img="images/oman/oman-76-pink-evening.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="pink purple sunset evening shore village figures sea oman" data-w="5760" data-h="3240" data-title="Pink Evening" data-price="$10" data-img="images/oman/oman-76-pink-evening.webp">
     <div class="g-media"><img src="images/oman/oman-76-pink-evening.webp" alt="Pink Evening" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Pink Evening</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="green headland misty mountains sea buildings shore birds oman" data-w="5760" data-h="3240" data-alt="1" data-title="Green Headland" data-price="$10" data-img="images/oman/oman-77-green-headland.webp">
+  <div class="g-item gl" data-category="coast" data-region="oman" data-tags="green headland misty mountains sea buildings shore birds oman" data-w="5760" data-h="3240" data-title="Green Headland" data-price="$10" data-img="images/oman/oman-77-green-headland.webp">
     <div class="g-media"><img src="images/oman/oman-77-green-headland.webp" alt="Green Headland" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Green Headland</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
@@ -854,11 +843,11 @@
     <div class="g-media"><img src="images/oman/oman-78-white-tower-by-the-water.webp" alt="White Tower by the Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">White Tower by the Water</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="boulders valley mountains dry clouds rocks sky oman" data-w="5760" data-h="3240" data-alt="1" data-title="Boulder Valley" data-price="$10" data-img="images/oman/oman-79-boulder-valley.webp">
+  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="boulders valley mountains dry clouds rocks sky oman" data-w="5760" data-h="3240" data-title="Boulder Valley" data-price="$10" data-img="images/oman/oman-79-boulder-valley.webp">
     <div class="g-media"><img src="images/oman/oman-79-boulder-valley.webp" alt="Boulder Valley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Boulder Valley</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="palms meadow village mountains green grass field oman" data-w="2240" data-h="1260" data-alt="1" data-title="Palm Meadow" data-price="$10" data-img="images/oman/oman-80-palm-meadow.webp">
+  <div class="g-item gl" data-category="mountains" data-region="oman" data-tags="palms meadow village mountains green grass field oman" data-w="2240" data-h="1260" data-title="Palm Meadow" data-price="$10" data-img="images/oman/oman-80-palm-meadow.webp">
     <div class="g-media"><img src="images/oman/oman-80-palm-meadow.webp" alt="Palm Meadow" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Palm Meadow</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
@@ -866,51 +855,51 @@
     <div class="g-media"><img src="images/oman/oman-81-monochrome-studies.webp" alt="Monochrome Studies" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Monochrome Studies</span><span class="g-cat">mountains</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="farm farmhouse cottage hills green fields sheep stone wall meadow pasture rural scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Hillside Farm" data-price="$10" data-img="images/scotland/scot-01-hillside-farm.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="farm farmhouse cottage hills green fields sheep stone wall meadow pasture rural scotland uk britain" data-w="5760" data-h="3240" data-title="Hillside Farm" data-price="$10" data-img="images/scotland/scot-01-hillside-farm.webp">
     <div class="g-media"><img src="images/scotland/scot-01-hillside-farm.webp" alt="Hillside Farm" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Hillside Farm</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="rivers" data-region="scotland" data-tags="bridge stone river water willows trees boat rowing reflection arch scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="The Old Stone Bridge" data-price="$10" data-img="images/scotland/scot-02-the-old-stone-bridge.webp">
+  <div class="g-item gl" data-category="rivers" data-region="scotland" data-tags="bridge stone river water willows trees boat rowing reflection arch scotland uk britain" data-w="5760" data-h="3240" data-title="The Old Stone Bridge" data-price="$10" data-img="images/scotland/scot-02-the-old-stone-bridge.webp">
     <div class="g-media"><img src="images/scotland/scot-02-the-old-stone-bridge.webp" alt="The Old Stone Bridge" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Old Stone Bridge</span><span class="g-cat">rivers</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="hay bales harvest field poplar trees blue sky summer farmland stubble scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Harvest Field" data-price="$10" data-img="images/scotland/scot-03-harvest-field.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="hay bales harvest field poplar trees blue sky summer farmland stubble scotland uk britain" data-w="5760" data-h="3240" data-title="Harvest Field" data-price="$10" data-img="images/scotland/scot-03-harvest-field.webp">
     <div class="g-media"><img src="images/scotland/scot-03-harvest-field.webp" alt="Harvest Field" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Harvest Field</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="scotland" data-tags="village green cricket people trees houses summer common gathering scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="The Village Green" data-price="$10" data-img="images/scotland/scot-04-the-village-green.webp">
+  <div class="g-item gl" data-category="villages" data-region="scotland" data-tags="village green cricket people trees houses summer common gathering scotland uk britain" data-w="5760" data-h="3240" data-title="The Village Green" data-price="$10" data-img="images/scotland/scot-04-the-village-green.webp">
     <div class="g-media"><img src="images/scotland/scot-04-the-village-green.webp" alt="The Village Green" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Village Green</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="coast" data-region="scotland" data-tags="beach huts colourful sand sea shore seaside figures holiday coast scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Beach Huts" data-price="$10" data-img="images/scotland/scot-05-beach-huts.webp">
+  <div class="g-item gl" data-category="coast" data-region="scotland" data-tags="beach huts colourful sand sea shore seaside figures holiday coast scotland uk britain" data-w="5760" data-h="3240" data-title="Beach Huts" data-price="$10" data-img="images/scotland/scot-05-beach-huts.webp">
     <div class="g-media"><img src="images/scotland/scot-05-beach-huts.webp" alt="Beach Huts" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Beach Huts</span><span class="g-cat">coast</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="villages" data-region="scotland" data-tags="cottage thatched thatch hollyhocks flowers pink garden fence roses english scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Cottage in Bloom" data-price="$10" data-img="images/scotland/scot-06-cottage-in-bloom.webp">
+  <div class="g-item gl" data-category="villages" data-region="scotland" data-tags="cottage thatched thatch hollyhocks flowers pink garden fence roses english scotland uk britain" data-w="5760" data-h="3240" data-title="Cottage in Bloom" data-price="$10" data-img="images/scotland/scot-06-cottage-in-bloom.webp">
     <div class="g-media"><img src="images/scotland/scot-06-cottage-in-bloom.webp" alt="Cottage in Bloom" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Cottage in Bloom</span><span class="g-cat">villages</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="rolling hills green fields hedgerows sheep valley pasture farmland scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Rolling Hills" data-price="$10" data-img="images/scotland/scot-07-rolling-hills.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="rolling hills green fields hedgerows sheep valley pasture farmland scotland uk britain" data-w="5760" data-h="3240" data-title="Rolling Hills" data-price="$10" data-img="images/scotland/scot-07-rolling-hills.webp">
     <div class="g-media"><img src="images/scotland/scot-07-rolling-hills.webp" alt="Rolling Hills" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Rolling Hills</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="mist fog moor moorland green hills spire atmospheric quiet damp scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Mist on the Moor" data-price="$10" data-img="images/scotland/scot-08-mist-on-the-moor.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="mist fog moor moorland green hills spire atmospheric quiet damp scotland uk britain" data-w="5760" data-h="3240" data-title="Mist on the Moor" data-price="$10" data-img="images/scotland/scot-08-mist-on-the-moor.webp">
     <div class="g-media"><img src="images/scotland/scot-08-mist-on-the-moor.webp" alt="Mist on the Moor" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Mist on the Moor</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="sunset sun hills purple orange sky dusk evening tree silhouette scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Sunset over the Hills" data-price="$10" data-img="images/scotland/scot-09-sunset-over-the-hills.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="sunset sun hills purple orange sky dusk evening tree silhouette scotland uk britain" data-w="5760" data-h="3240" data-title="Sunset over the Hills" data-price="$10" data-img="images/scotland/scot-09-sunset-over-the-hills.webp">
     <div class="g-media"><img src="images/scotland/scot-09-sunset-over-the-hills.webp" alt="Sunset over the Hills" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Sunset over the Hills</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="scotland" data-tags="poppies poppy field red flowers hills summer meadow blooms scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Poppy Field" data-price="$10" data-img="images/scotland/scot-10-poppy-field.webp">
+  <div class="g-item gl" data-category="botanical" data-region="scotland" data-tags="poppies poppy field red flowers hills summer meadow blooms scotland uk britain" data-w="5760" data-h="3240" data-title="Poppy Field" data-price="$10" data-img="images/scotland/scot-10-poppy-field.webp">
     <div class="g-media"><img src="images/scotland/scot-10-poppy-field.webp" alt="Poppy Field" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Poppy Field</span><span class="g-cat">botanical</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="storm clouds dramatic moor moorland hills dark weather rain sky scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Storm over the Moor" data-price="$10" data-img="images/scotland/scot-11-storm-over-the-moor.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="storm clouds dramatic moor moorland hills dark weather rain sky scotland uk britain" data-w="5760" data-h="3240" data-title="Storm over the Moor" data-price="$10" data-img="images/scotland/scot-11-storm-over-the-moor.webp">
     <div class="g-media"><img src="images/scotland/scot-11-storm-over-the-moor.webp" alt="Storm over the Moor" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Storm over the Moor</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="rivers" data-region="scotland" data-tags="bridge stone river willows trees water reflection arch stream green scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Bridge and Willows" data-price="$10" data-img="images/scotland/scot-12-bridge-and-willows.webp">
+  <div class="g-item gl" data-category="rivers" data-region="scotland" data-tags="bridge stone river willows trees water reflection arch stream green scotland uk britain" data-w="5760" data-h="3240" data-title="Bridge and Willows" data-price="$10" data-img="images/scotland/scot-12-bridge-and-willows.webp">
     <div class="g-media"><img src="images/scotland/scot-12-bridge-and-willows.webp" alt="Bridge and Willows" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Bridge and Willows</span><span class="g-cat">rivers</span></div><span class="g-price">$10</span></div>
   </div>
@@ -918,23 +907,23 @@
     <div class="g-media"><img src="images/scotland/scot-13-winter-farm.webp" alt="Winter Farm" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Winter Farm</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="autumn mist hills orange trees fog valley fall golden hillside scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Autumn Mist" data-price="$10" data-img="images/scotland/scot-14-autumn-mist.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="autumn mist hills orange trees fog valley fall golden hillside scotland uk britain" data-w="5760" data-h="3240" data-title="Autumn Mist" data-price="$10" data-img="images/scotland/scot-14-autumn-mist.webp">
     <div class="g-media"><img src="images/scotland/scot-14-autumn-mist.webp" alt="Autumn Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Autumn Mist</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="night stars starlit blue snow fields moonlight dark winter sky scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Starlit Fields" data-price="$10" data-img="images/scotland/scot-15-starlit-fields.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="night stars starlit blue snow fields moonlight dark winter sky scotland uk britain" data-w="5760" data-h="3240" data-title="Starlit Fields" data-price="$10" data-img="images/scotland/scot-15-starlit-fields.webp">
     <div class="g-media"><img src="images/scotland/scot-15-starlit-fields.webp" alt="Starlit Fields" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Starlit Fields</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="scotland" data-tags="bluebells bluebell wood woodland trees spring purple blue flowers forest scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Bluebell Wood" data-price="$10" data-img="images/scotland/scot-16-bluebell-wood.webp">
+  <div class="g-item gl" data-category="botanical" data-region="scotland" data-tags="bluebells bluebell wood woodland trees spring purple blue flowers forest scotland uk britain" data-w="5760" data-h="3240" data-title="Bluebell Wood" data-price="$10" data-img="images/scotland/scot-16-bluebell-wood.webp">
     <div class="g-media"><img src="images/scotland/scot-16-bluebell-wood.webp" alt="Bluebell Wood" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Bluebell Wood</span><span class="g-cat">botanical</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="barley wheat field crop clouds blue sky summer golden farmland poppies scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Barley Field" data-price="$10" data-img="images/scotland/scot-17-barley-field.webp">
+  <div class="g-item gl" data-category="countryside" data-region="scotland" data-tags="barley wheat field crop clouds blue sky summer golden farmland poppies scotland uk britain" data-w="5760" data-h="3240" data-title="Barley Field" data-price="$10" data-img="images/scotland/scot-17-barley-field.webp">
     <div class="g-media"><img src="images/scotland/scot-17-barley-field.webp" alt="Barley Field" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Barley Field</span><span class="g-cat">countryside</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="scotland" data-tags="blossom blossoms trees lane path spring white flowers track countryside scotland uk britain" data-w="5760" data-h="3240" data-alt="1" data-title="Blossom Lane" data-price="$10" data-img="images/scotland/scot-18-blossom-lane.webp">
+  <div class="g-item gl" data-category="botanical" data-region="scotland" data-tags="blossom blossoms trees lane path spring white flowers track countryside scotland uk britain" data-w="5760" data-h="3240" data-title="Blossom Lane" data-price="$10" data-img="images/scotland/scot-18-blossom-lane.webp">
     <div class="g-media"><img src="images/scotland/scot-18-blossom-lane.webp" alt="Blossom Lane" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Blossom Lane</span><span class="g-cat">botanical</span></div><span class="g-price">$10</span></div>
   </div>
@@ -986,10 +975,6 @@
     <div class="title" id="lightboxTitle"></div>
     <div class="price" id="lightboxPrice"></div>
     <div class="lb-detail" id="lbDetail"></div>
-    <div class="lb-orient" id="lbOrient">
-      <button type="button" class="lb-size lb-o" data-orient="portrait">Portrait</button>
-      <button type="button" class="lb-size lb-o" data-orient="landscape">Landscape</button>
-    </div>
     <div class="lb-sizes" id="lbSizes">
       <button type="button" class="lb-size" data-size="A5">A5</button>
       <button type="button" class="lb-size active" data-size="A4">A4</button>
@@ -1077,8 +1062,6 @@
   const lbTitle = document.getElementById('lightboxTitle');
   const lbPrice = document.getElementById('lightboxPrice');
   const lbDetail = document.getElementById('lbDetail');
-  const lbImgWrap = document.querySelector('.lightbox-img-wrap');
-  const lbOrient = document.getElementById('lbOrient');
   const lbSizes = document.getElementById('lbSizes');
   const lbQuality = document.getElementById('lbQuality');
   const lbBuy = document.getElementById('lightboxBuy');
@@ -1090,55 +1073,32 @@
 
   function dpiFor(size){
     const [pShort, pLong] = PAPER[size];
-    const short = Math.min(effW, effH), long = Math.max(effW, effH);
+    const short = Math.min(currentW, currentH), long = Math.max(currentW, currentH);
     return (short && long) ? Math.round(Math.min(short / pShort, long / pLong)) : 0;
   }
 
   let currentPainting = null, currentCategory = null, currentPrice = '', currentSize = null;
-  let nativeW = 0, nativeH = 0, effW = 0, effH = 0, orientation = 'native', altAvailable = false;
+  let currentW = 0, currentH = 0;
 
   function orientName(){
-    return effH > effW ? 'Portrait' : 'Landscape';
-  }
-  function cropNote(){
-    return orientation === 'alt' ? ' (cropped from the original ' + nativeW + ' × ' + nativeH + ')' : '';
+    return currentH > currentW ? 'Portrait' : 'Landscape';
   }
 
   function updateSize(){
     const dpi = dpiFor(currentSize);
     lbQuality.innerHTML = 'At ' + currentSize + ' ' + orientName().toLowerCase() + ': ~' + dpi + ' DPI · <b style="color:#5aa469">sharp</b>';
     const body = 'Hi James, I would like to purchase the soft copy file for "' + currentPainting + '" (' + currentPrice + ').'
-      + '\nOrientation: ' + orientName() + cropNote() + '.'
+      + '\nOrientation: ' + orientName() + '.'
       + '\nPreferred print size: ' + currentSize + ' (approx ' + dpi + ' DPI).'
-      + '\nFile resolution: ' + effW + ' × ' + effH + ' px.';
+      + '\nFile resolution: ' + currentW + ' × ' + currentH + ' px.';
     lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + currentPainting + ' (' + currentSize + ' ' + orientName() + ')') + '&body=' + encodeURIComponent(body);
   }
 
   function buyNoSize(){
     const body = 'Hi James, I would like to purchase the soft copy file for "' + currentPainting + '" (' + currentPrice + ').'
-      + '\nOrientation: ' + orientName() + cropNote() + '.'
-      + '\nFile resolution: ' + effW + ' × ' + effH + ' px.';
+      + '\nOrientation: ' + orientName() + '.'
+      + '\nFile resolution: ' + currentW + ' × ' + currentH + ' px.';
     lbBuy.href = 'mailto:james.highlands.art@outlook.com?subject=' + encodeURIComponent('Purchase Inquiry: ' + currentPainting) + '&body=' + encodeURIComponent(body);
-  }
-
-  // switch between the painting's native orientation and a centre-cropped alternate
-  function setOrientation(mode){
-    orientation = mode;
-    if (mode === 'alt'){
-      if (nativeH > nativeW){ effW = nativeW; effH = Math.round(nativeW * 9 / 16); }
-      else { effH = nativeH; effW = Math.round(nativeH * 9 / 16); }
-      lbImgWrap.classList.add('cropped');
-      lbImgWrap.style.setProperty('--r', (effW / effH).toFixed(4));
-    } else {
-      effW = nativeW; effH = nativeH;
-      lbImgWrap.classList.remove('cropped');
-      lbImgWrap.style.removeProperty('--r');
-    }
-    const isPortrait = effH > effW;
-    lbOrient.querySelectorAll('.lb-o').forEach(b =>
-      b.classList.toggle('active', (b.dataset.orient === 'portrait') === isPortrait));
-    lbDetail.textContent = 'Resolution: ' + effW + ' × ' + effH + ' px' + cropNote();
-    setupSizes();
   }
 
   function setupSizes(){
@@ -1172,14 +1132,6 @@
     });
   });
 
-  lbOrient.querySelectorAll('.lb-o').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      const wantPortrait = btn.dataset.orient === 'portrait';
-      const nativeIsPortrait = nativeH > nativeW;
-      setOrientation(wantPortrait === nativeIsPortrait ? 'native' : 'alt');
-    });
-  });
-
   items.forEach(item=>{
     item.addEventListener('click', ()=>{
       const title = item.dataset.title;
@@ -1188,22 +1140,21 @@
       currentPainting = title;
       currentCategory = item.dataset.category;
       currentPrice = price;
-      nativeW = parseInt(item.dataset.w, 10) || 0;
-      nativeH = parseInt(item.dataset.h, 10) || 0;
-      altAvailable = item.dataset.alt === '1';
+      currentW = parseInt(item.dataset.w, 10) || 0;
+      currentH = parseInt(item.dataset.h, 10) || 0;
       lbImg.src = img;
       lbImg.alt = title;
       lbTitle.textContent = title;
       lbPrice.textContent = price + ' — Soft Copy File';
-      lbOrient.style.display = altAvailable ? '' : 'none';
-      setOrientation('native');
+      lbDetail.textContent = 'Resolution: ' + currentW + ' × ' + currentH + ' px';
+      setupSizes();
       lightbox.classList.add('open');
       sendTrack({ event: 'click', painting: title, category: item.dataset.category });
     });
   });
 
   // buy-intent: fires when the "Buy Soft Copy" button is clicked
-  lbBuy.addEventListener('click', ()=>{ sendTrack({ event: 'buy', painting: currentPainting, category: currentCategory, size: currentSize, orientation: orientName() }); });
+  lbBuy.addEventListener('click', ()=>{ sendTrack({ event: 'buy', painting: currentPainting, category: currentCategory, size: currentSize }); });
 
   document.getElementById('lightboxClose').addEventListener('click', ()=> lightbox.classList.remove('open'));
   lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) lightbox.classList.remove('open'); });
