@@ -204,7 +204,7 @@
   .filter-btns::-webkit-scrollbar-track{background:transparent;}
   .filter-btns::-webkit-scrollbar-thumb{background:rgba(33,31,28,.25);border-radius:3px;}
   .filter-btns > *{flex:0 0 auto;}
-  .filter-btn{
+  .filter-btn, .drop-toggle{
     font-family:'Helvetica Neue',Arial,sans-serif;
     font-size:12px;letter-spacing:.12em;text-transform:uppercase;
     padding:10px 20px;
@@ -214,8 +214,56 @@
     cursor:pointer;
     transition:background .3s ease, color .3s ease, border-color .3s ease;
   }
-  .filter-btn:hover{color:var(--ink);border-color:var(--ink);}
-  .filter-btn.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+  .filter-btn:hover, .drop-toggle:hover{color:var(--ink);border-color:var(--ink);}
+  .filter-btn.active, .drop-toggle.active{background:var(--ink);color:var(--bg);border-color:var(--ink);}
+
+  /* COUNTRIES DROPDOWN — sits outside the scrolling chip row so it isn't clipped */
+  .dropdown{position:relative;flex:0 0 auto;}
+  .drop-toggle{display:flex;align-items:center;gap:9px;white-space:nowrap;}
+  .drop-caret{transition:transform .25s ease;}
+  .dropdown.open .drop-caret{transform:rotate(180deg);}
+  .drop-panel{
+    display:none;
+    position:absolute;top:calc(100% + 6px);left:0;
+    z-index:60;
+    min-width:220px;max-height:330px;overflow-y:auto;
+    padding:6px;
+    background:var(--bg);
+    border:1px solid var(--ink);
+    box-shadow:0 14px 34px rgba(33,31,28,.18);
+  }
+  .drop-panel.open{display:block;}
+  .drop-item{
+    display:flex;justify-content:space-between;align-items:center;gap:18px;
+    width:100%;text-align:left;
+    font-family:'Helvetica Neue',Arial,sans-serif;
+    font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+    padding:11px 14px;
+    background:transparent;border:none;color:var(--ink-dim);cursor:pointer;
+    transition:background .2s ease,color .2s ease;
+  }
+  .drop-item:hover{background:var(--bg-soft);color:var(--ink);}
+  .drop-item.active{background:var(--ink);color:var(--bg);}
+  .drop-count{opacity:.6;font-size:11px;}
+
+  /* BACK TO TOP */
+  .to-top{
+    position:fixed;right:22px;bottom:22px;z-index:90;
+    width:46px;height:46px;border-radius:50%;
+    display:grid;place-items:center;
+    background:var(--bg);color:var(--ink);
+    border:1px solid var(--line);
+    cursor:pointer;
+    box-shadow:0 8px 22px rgba(33,31,28,.18);
+    opacity:0;visibility:hidden;transform:translateY(10px);
+    transition:opacity .3s ease, transform .3s ease, visibility .3s ease, background .3s ease, color .3s ease;
+  }
+  .to-top.show{opacity:1;visibility:visible;transform:none;}
+  .to-top:hover{background:var(--ink);color:var(--bg);}
+  @media(max-width:900px){
+    .drop-panel{left:0;right:0;min-width:0;}
+    .to-top{right:16px;bottom:16px;width:50px;height:50px;}
+  }
   .filter-sep{
     align-self:center;
     font-family:'Helvetica Neue',Arial,sans-serif;
@@ -502,13 +550,13 @@
     <button class="filter-btn" data-type="category" data-filter="wildlife">Wildlife</button>
     <button class="filter-btn" data-type="category" data-filter="botanical">Botanical</button>
     <button class="filter-btn" data-type="category" data-filter="interior">Interior</button>
-    <span class="filter-sep">Regions</span>
-    <button class="filter-btn" data-type="region" data-filter="oman">Oman</button>
-    <button class="filter-btn" data-type="region" data-filter="scotland">Scotland</button>
-    <button class="filter-btn" data-type="region" data-filter="france">France</button>
-    <button class="filter-btn" data-type="region" data-filter="italy">Italy</button>
-    <button class="filter-btn" data-type="region" data-filter="glasgow">Glasgow</button>
-    <button class="filter-btn" data-type="region" data-filter="uk">UK</button>
+  </div>
+  <div class="dropdown" id="countryDrop">
+    <button type="button" class="drop-toggle" id="countryToggle" aria-haspopup="true" aria-expanded="false">
+      <span id="countryLabel">Countries</span>
+      <svg class="drop-caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+    </button>
+    <div class="drop-panel" id="countryPanel" role="menu"></div>
   </div>
   <div class="search-box">
     <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -1495,6 +1543,10 @@
   </div>
 </footer>
 
+<button type="button" class="to-top" id="toTop" aria-label="Back to top" title="Back to top">
+  <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+</button>
+
 <div class="lightbox" id="lightbox">
   <div class="lightbox-close" id="lightboxClose">Close ✕</div>
   <div class="lightbox-img-wrap">
@@ -1533,6 +1585,49 @@
   document.addEventListener('contextmenu', (e)=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
 
   // category filter + search
+  // countries dropdown, built from the paintings actually present so it can
+  // never list an empty country and picks up new ones on its own
+  const countryDrop = document.getElementById('countryDrop');
+  const countryToggle = document.getElementById('countryToggle');
+  const countryPanel = document.getElementById('countryPanel');
+  const countryLabel = document.getElementById('countryLabel');
+  const COUNTRY_NAMES = { uk:'UK', usa:'USA', uae:'UAE' };
+  const prettyCountry = r => COUNTRY_NAMES[r] || r.charAt(0).toUpperCase() + r.slice(1);
+
+  (function buildCountries(){
+    const counts = {};
+    document.querySelectorAll('.g-item[data-region]').forEach(i=>{
+      const r = i.dataset.region;
+      if (r) counts[r] = (counts[r] || 0) + 1;
+    });
+    const names = Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b));
+    if (!names.length){ countryDrop.style.display = 'none'; return; }
+    countryPanel.innerHTML = names.map(r =>
+      `<button type="button" class="filter-btn drop-item" data-type="region" data-filter="${r}" role="menuitem">` +
+      `<span>${prettyCountry(r)}</span><span class="drop-count">${counts[r]}</span></button>`).join('');
+  })();
+
+  function setDropOpen(open){
+    countryDrop.classList.toggle('open', open);
+    countryPanel.classList.toggle('open', open);
+    countryToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  countryToggle.addEventListener('click', e=>{
+    e.stopPropagation();
+    setDropOpen(!countryPanel.classList.contains('open'));
+  });
+  document.addEventListener('click', e=>{
+    if (!countryDrop.contains(e.target)) setDropOpen(false);
+  });
+  document.addEventListener('keydown', e=>{ if (e.key === 'Escape') setDropOpen(false); });
+
+  // keep the toggle showing which country (if any) is selected
+  function syncCountryToggle(){
+    const active = document.querySelector('.drop-item.active');
+    countryToggle.classList.toggle('active', !!active);
+    countryLabel.textContent = active ? prettyCountry(active.dataset.filter) : 'Countries';
+  }
+
   const filterBtns = document.querySelectorAll('.filter-btn');
   const galleryItems = document.querySelectorAll('.g-item');
   const searchInput = document.getElementById('searchInput');
@@ -1562,10 +1657,19 @@
     btn.addEventListener('click', ()=>{
       filterBtns.forEach(b=>b.classList.remove('active'));
       btn.classList.add('active');
+      if (btn.classList.contains('drop-item')) setDropOpen(false);
+      syncCountryToggle();
       applyFilters();
     });
   });
   searchInput.addEventListener('input', applyFilters);
+
+  // back to top
+  const toTop = document.getElementById('toTop');
+  addEventListener('scroll', ()=>{
+    toTop.classList.toggle('show', window.scrollY > 700);
+  }, { passive:true });
+  toTop.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
 
   // search-intent: log the query ~1s after the visitor stops typing
   let searchTimer;
