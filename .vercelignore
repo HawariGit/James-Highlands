@@ -1,0 +1,6 @@
+# Source archives live in this folder for convenience but must never be
+# uploaded: they are hundreds of MB and exceed Vercel's 100MB file limit.
+*.zip
+
+# Installed on Vercel from package.json
+node_modules
