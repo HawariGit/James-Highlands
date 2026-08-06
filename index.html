@@ -1717,6 +1717,21 @@
   document.addEventListener('contextmenu', (e)=>{ if(e.target.tagName === 'IMG') e.preventDefault(); });
 
   // category filter + search
+  // shuffle the gallery once per visit, so every painting gets a turn near the
+  // top instead of always being buried by whichever collection it belongs to
+  (function shuffleGallery(){
+    const gallery = document.getElementById('gallery');
+    const end = document.getElementById('noResults');
+    const items = [...gallery.querySelectorAll('.g-item')];
+    for (let i = items.length - 1; i > 0; i--){          // Fisher-Yates
+      const j = Math.floor(Math.random() * (i + 1));
+      [items[i], items[j]] = [items[j], items[i]];
+    }
+    const frag = document.createDocumentFragment();
+    items.forEach(el => frag.appendChild(el));
+    gallery.insertBefore(frag, end);                     // keep "no results" last
+  })();
+
   // countries dropdown, built from the paintings actually present so it can
   // never list an empty country and picks up new ones on its own
   const countryDrop = document.getElementById('countryDrop');
