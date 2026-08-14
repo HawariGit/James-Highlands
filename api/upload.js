@@ -42,6 +42,8 @@ export default async function handler(req, res) {
   if (!pwOk(pw)) return deny(res);
 
   if (req.method === 'POST') return handlePost(req, res);
+  // never let a browser hold on to an old copy of this page
+  res.setHeader('cache-control', 'no-store, must-revalidate');
   return res.setHeader('content-type', 'text/html').status(200).send(page(String(req.query.pw)));
 }
 
@@ -106,6 +108,10 @@ async function handlePost(req, res) {
   }
 }
 
+// bumped by hand when this page changes, so it's possible to tell from the
+// page itself whether a browser is showing an old copy
+const PAGE_VERSION = 'v3';
+
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
   const setupNote = needsBlob ? `<div class="warn setup">
@@ -131,7 +137,9 @@ function page(pw) {
   .pick{display:block;background:var(--card);border:2px dashed var(--line);padding:34px 20px;text-align:center;
     cursor:pointer;font-size:15px;margin-bottom:24px;}
   .pick:active{background:#f0dcb4;}
-  input[type=file]{display:none;}
+  /* not display:none — some mobile browsers refuse to open a file input that
+     has been removed from the layout, even via a label[for] */
+  input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;}
   .card{background:var(--card);border:1px solid var(--line);padding:16px;margin-bottom:16px;display:grid;
     grid-template-columns:112px 1fr;gap:16px;align-items:start;}
   .thumbs{display:flex;flex-direction:column;gap:8px;}
@@ -164,7 +172,8 @@ function page(pw) {
   @media(max-width:560px){ .card{grid-template-columns:1fr;} .thumbs{flex-direction:row;} .thumb,.corner{width:50%;height:96px;} }
 </style></head><body>
 <h1>Add Paintings</h1>
-<div class="sub">Pick photos, check each one, then publish. They appear on the site straight away.</div>
+<div class="sub">Pick photos, check each one, then publish. They appear on the site straight away.
+  &nbsp;<span style="opacity:.5">${PAGE_VERSION}</span></div>
 ${setupNote}
 <div class="warn">
   <b>Before publishing, check the corner preview on each photo.</b> It shows the bottom-right
@@ -332,10 +341,19 @@ function render(){
     'Publish ' + staged.length + (staged.length === 1 ? ' painting' : ' paintings');
 }
 
+// drive the input from script rather than relying on label[for], which does
+// not reliably reach a hidden input on every mobile browser
+document.querySelector('.pick').addEventListener('click', function(e){
+  e.preventDefault();
+  try { document.getElementById('files').click(); }
+  catch(err){ say('This browser would not open the photo chooser: ' + err.message); }
+});
+
 document.getElementById('files').addEventListener('change', function(ev){
   var files = [].slice.call(ev.target.files || []);
   ev.target.value = '';
-  say(files.length ? 'Reading ' + files.length + ' photo' + (files.length === 1 ? '' : 's') + '…' : '');
+  if(!files.length){ say('No photos were selected.'); return; }
+  say('Reading ' + files.length + ' photo' + (files.length === 1 ? '' : 's') + '…');
   files.reduce(function(chain, file){
     return chain.then(function(){
       return readFile(file).then(function(r){
