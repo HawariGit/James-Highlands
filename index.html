@@ -1749,7 +1749,7 @@
   const COUNTRY_NAMES = { uk:'UK', usa:'USA', uae:'UAE' };
   const prettyCountry = r => COUNTRY_NAMES[r] || r.charAt(0).toUpperCase() + r.slice(1);
 
-  (function buildCountries(){
+  function buildCountries(){
     const counts = {};
     document.querySelectorAll('.g-item[data-region]').forEach(i=>{
       const r = i.dataset.region;
@@ -1757,10 +1757,13 @@
     });
     const names = Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b));
     if (!names.length){ countryDrop.style.display = 'none'; return; }
+    countryDrop.style.display = '';
+    const chosen = document.querySelector('.drop-item.active');
     countryPanel.innerHTML = names.map(r =>
-      `<button type="button" class="filter-btn drop-item" data-type="region" data-filter="${r}" role="menuitem">` +
+      `<button type="button" class="filter-btn drop-item${chosen && chosen.dataset.filter === r ? ' active' : ''}" data-type="region" data-filter="${r}" role="menuitem">` +
       `<span>${prettyCountry(r)}</span><span class="drop-count">${counts[r]}</span></button>`).join('');
-  })();
+  }
+  buildCountries();
 
   function setDropOpen(open){
     countryDrop.classList.toggle('open', open);
@@ -1783,8 +1786,7 @@
     countryLabel.textContent = active ? prettyCountry(active.dataset.filter) : 'Countries';
   }
 
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const galleryItems = document.querySelectorAll('.g-item');
+  let galleryItems = document.querySelectorAll('.g-item');
   const searchInput = document.getElementById('searchInput');
   const noResults = document.getElementById('noResults');
 
@@ -1808,15 +1810,22 @@
     noResults.style.display = visible === 0 ? 'block' : 'none';
   }
 
-  filterBtns.forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      filterBtns.forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      if (btn.classList.contains('drop-item')) setDropOpen(false);
-      syncCountryToggle();
-      applyFilters();
+  // re-callable: buildCountries() replaces the dropdown buttons, so any new ones
+  // need binding too. Already-bound buttons are skipped.
+  function wireFilterBtns(){
+    document.querySelectorAll('.filter-btn').forEach(btn=>{
+      if (btn.dataset.wired) return;
+      btn.dataset.wired = '1';
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        if (btn.classList.contains('drop-item')) setDropOpen(false);
+        syncCountryToggle();
+        applyFilters();
+      });
     });
-  });
+  }
+  wireFilterBtns();
   searchInput.addEventListener('input', applyFilters);
 
   // back to top
@@ -1836,14 +1845,12 @@
     }
   });
 
-  // scroll reveal
-  const items = document.querySelectorAll('.g-item');
+  // scroll reveal — cards are observed in wireItems(), below
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       if(e.isIntersecting){ e.target.classList.add('in'); }
     });
   },{threshold:0.15});
-  items.forEach(i=>io.observe(i));
 
   // lightbox
   const lightbox = document.getElementById('lightbox');
@@ -1921,7 +1928,15 @@
     });
   });
 
-  items.forEach(item=>{
+  // Wires every card that isn't wired yet — scroll reveal plus the lightbox.
+  // Called again after uploaded works are merged in, so those cards behave
+  // exactly like the ones written into this file.
+  function wireItems(){
+    galleryItems = document.querySelectorAll('.g-item');
+    galleryItems.forEach(item=>{
+    if (item.dataset.wired) return;
+    item.dataset.wired = '1';
+    io.observe(item);
     item.addEventListener('click', ()=>{
       const title = item.dataset.title;
       const price = item.dataset.price;
@@ -1940,7 +1955,9 @@
       lightbox.classList.add('open');
       sendTrack({ event: 'click', painting: title, category: item.dataset.category });
     });
-  });
+    });
+  }
+  wireItems();
 
   // buy-intent: fires when the "Buy Soft Copy" button is clicked
   lbBuy.addEventListener('click', ()=>{ sendTrack({ event: 'buy', painting: currentPainting, category: currentCategory, size: currentSize }); });
@@ -1948,6 +1965,67 @@
   document.getElementById('lightboxClose').addEventListener('click', ()=> lightbox.classList.remove('open'));
   lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) lightbox.classList.remove('open'); });
   document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') lightbox.classList.remove('open'); });
+
+  // Paintings added through /api/upload are stored in the database rather than
+  // written into this file, so they're merged in here on top of the built-in
+  // gallery. If the request fails the page is simply left as it is.
+  (function loadUploadedWorks(){
+    const gallery = document.getElementById('gallery');
+    const end = document.getElementById('noResults');
+
+    function buildCard(w){
+      const card = document.createElement('div');
+      card.className = 'g-item ' + (w.height > w.width ? 'gp' : 'gl');
+      card.dataset.category = w.category || 'landscape';
+      if (w.region) card.dataset.region = w.region;
+      card.dataset.tags = w.tags || '';
+      card.dataset.w = w.width;
+      card.dataset.h = w.height;
+      card.dataset.title = w.title;
+      card.dataset.price = w.price;
+      card.dataset.img = w.img_url;
+
+      const img = document.createElement('img');
+      img.src = w.img_url; img.alt = w.title;
+      img.draggable = false; img.loading = 'lazy'; img.decoding = 'async';
+      const media = document.createElement('div'); media.className = 'g-media';
+      const mark = document.createElement('div'); mark.className = 'g-watermark';
+      media.appendChild(img); media.appendChild(mark);
+
+      const title = document.createElement('span');
+      title.className = 'g-title'; title.textContent = w.title;
+      const cat = document.createElement('span');
+      cat.className = 'g-cat'; cat.textContent = w.category || '';
+      const left = document.createElement('div');
+      left.appendChild(title); left.appendChild(cat);
+      const price = document.createElement('span');
+      price.className = 'g-price'; price.textContent = w.price;
+      const meta = document.createElement('div'); meta.className = 'g-meta';
+      meta.appendChild(left); meta.appendChild(price);
+
+      card.appendChild(media); card.appendChild(meta);
+      return card;
+    }
+
+    fetch('/api/works').then(r => r.json()).then(data => {
+      const works = (data && data.works) || [];
+      if (!works.length) return;
+      works.forEach(w => {
+        const existing = gallery.querySelectorAll('.g-item');
+        // drop each one in at a random spot, so newly added work isn't stranded
+        // at the end of a gallery that is otherwise shuffled every visit
+        const before = existing.length
+          ? existing[Math.floor(Math.random() * existing.length)]
+          : end;
+        gallery.insertBefore(buildCard(w), before);
+      });
+      buildCountries();   // new countries may have appeared
+      wireFilterBtns();
+      syncCountryToggle();
+      wireItems();
+      applyFilters();     // respect whatever filter/search is already active
+    }).catch(()=>{});
+  })();
 </script>
 
 </body>
