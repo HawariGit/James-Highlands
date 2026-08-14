@@ -77,9 +77,11 @@ async function handlePost(req, res) {
       const height = parseInt(body.height, 10) || 0;
       if (!width || !height) return res.status(400).json({ ok: false, error: 'Missing image dimensions.' });
 
-      const m = /^data:image\/webp;base64,([A-Za-z0-9+/=]+)$/.exec(String(body.image || ''));
-      if (!m) return res.status(400).json({ ok: false, error: 'Image was not a WebP upload.' });
-      const buf = Buffer.from(m[1], 'base64');
+      // WebP where the browser can encode it, JPEG where it can't (Safari)
+      const m = /^data:image\/(webp|jpeg);base64,([A-Za-z0-9+/=]+)$/.exec(String(body.image || ''));
+      if (!m) return res.status(400).json({ ok: false, error: 'Image was not in a format this page could convert.' });
+      const fmt = m[1];
+      const buf = Buffer.from(m[2], 'base64');
       if (buf.length > 4_000_000) return res.status(413).json({ ok: false, error: 'Display image too large.' });
 
       const category = CATEGORIES.includes(body.category) ? body.category : 'landscape';
@@ -88,8 +90,8 @@ async function handlePost(req, res) {
       const tags = String(body.tags || '').trim().slice(0, 400) || null;
       const phash = /^[01]{64}$/.test(String(body.phash || '')) ? String(body.phash) : null;
 
-      const name = 'uploads/' + slug(title) + '-' + Date.now().toString(36) + '.webp';
-      const blob = await put(name, buf, { access: 'public', contentType: 'image/webp' });
+      const name = 'uploads/' + slug(title) + '-' + Date.now().toString(36) + (fmt === 'webp' ? '.webp' : '.jpg');
+      const blob = await put(name, buf, { access: 'public', contentType: 'image/' + fmt });
 
       const [row] = await sql`INSERT INTO works
         (title, category, region, tags, price, width, height, img_url, phash)
@@ -174,6 +176,7 @@ ${setupNote}
 <label class="pick" for="files">📷 &nbsp;Tap to choose photos</label>
 <input type="file" id="files" accept="image/*" multiple>
 
+<div class="warn" id="msg" style="display:none"></div>
 <div id="staged"></div>
 
 <div class="bar" id="bar" style="display:none">
@@ -194,10 +197,24 @@ var staged = [];
 var existingHashes = [];
 
 function el(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+// the status line lives in a bar that is hidden while nothing is staged, so
+// anything that goes wrong before then has to be reported here instead
+function say(text){
+  var m = document.getElementById('msg');
+  m.textContent = text || '';
+  m.style.display = text ? 'block' : 'none';
+}
 function post(payload){
   payload.pw = PW;
   return fetch(location.pathname, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)})
-    .then(function(r){ return r.json(); });
+    .then(function(r){
+      // errors from the platform itself (size limits, timeouts) come back as
+      // HTML, so read as text first and report something useful either way
+      return r.text().then(function(t){
+        try { return JSON.parse(t); }
+        catch(e){ return {ok:false, error:'server replied ' + r.status + ' — ' + t.slice(0,150).replace(/<[^>]*>/g,' ').trim()}; }
+      });
+    });
 }
 
 // $10 only if the original prints A3 sharply, matching the site's pricing rule
@@ -244,7 +261,14 @@ function makeDisplay(img){
   var c = document.createElement('canvas');
   c.width = Math.round(w * scale); c.height = Math.round(h * scale);
   c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-  return c.toDataURL('image/webp', 0.85);
+  // Safari and older browsers ignore image/webp here and quietly hand back a
+  // PNG, which the server rejects and which is big enough to blow the request
+  // size limit — so check what we actually got and fall back to JPEG.
+  var url = c.toDataURL('image/webp', 0.85);
+  if (url.indexOf('data:image/webp') !== 0) url = c.toDataURL('image/jpeg', 0.85);
+  // last resort for very large images: re-encode smaller rather than fail
+  if (url.length > 3500000) url = c.toDataURL('image/jpeg', 0.7);
+  return url;
 }
 
 // magnified bottom-right corner, where AI watermarks sit
@@ -311,7 +335,7 @@ function render(){
 document.getElementById('files').addEventListener('change', function(ev){
   var files = [].slice.call(ev.target.files || []);
   ev.target.value = '';
-  var status = document.getElementById('status');
+  say(files.length ? 'Reading ' + files.length + ' photo' + (files.length === 1 ? '' : 's') + '…' : '');
   files.reduce(function(chain, file){
     return chain.then(function(){
       return readFile(file).then(function(r){
@@ -337,7 +361,12 @@ document.getElementById('files').addEventListener('change', function(ev){
         render();
       });
     });
-  }, Promise.resolve()).catch(function(e){ status.textContent = e.message; });
+  }, Promise.resolve())
+    .then(function(){ say(''); })
+    .catch(function(e){
+      say('Could not read that photo: ' + (e && e.message ? e.message : e) +
+          ' — if it came straight off an iPhone try sharing it as JPEG, or pick it from Photos rather than Files.');
+    });
 });
 
 document.getElementById('publish').addEventListener('click', function(){
