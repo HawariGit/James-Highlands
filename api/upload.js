@@ -59,6 +59,15 @@ async function handlePost(req, res) {
       return res.status(200).json({ ok: true, works: rows });
     }
 
+    if (body.action === 'rename') {
+      const id = parseInt(body.id, 10);
+      const title = String(body.title || '').trim().slice(0, 120);
+      if (!id) return res.status(400).json({ ok: false, error: 'No id given.' });
+      if (!title) return res.status(400).json({ ok: false, error: 'A title is required.' });
+      await sql`UPDATE works SET title = ${title} WHERE id = ${id}`;
+      return res.status(200).json({ ok: true });
+    }
+
     if (body.action === 'delete') {
       const id = parseInt(body.id, 10);
       if (!id) return res.status(400).json({ ok: false, error: 'No id given.' });
@@ -110,7 +119,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v3';
+const PAGE_VERSION = 'v4';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -165,7 +174,11 @@ function page(pw) {
     padding:10px;margin-bottom:8px;font-size:14px;}
   .live img{width:52px;height:52px;object-fit:cover;background:#fff;flex-shrink:0;}
   .live .g{flex:1;min-width:0;}
-  .live .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .live .t{width:100%;padding:5px 7px;border:1px solid transparent;background:none;
+    font-family:inherit;font-size:14px;color:var(--ink);}
+  .live .t:hover{border-color:var(--line);background:#fff;}
+  .live .t:focus{border-color:var(--accent);background:#fff;outline:none;}
+  input.needed{border-color:#c0392b;background:#fff6f5;}
   .live .d{font-size:11px;color:var(--dim);margin-top:2px;}
   .pending{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);
     color:#fff;padding:2px 6px;margin-left:6px;}
@@ -234,8 +247,15 @@ function suggestPrice(w, h){
 }
 
 function titleFromName(name){
-  return name.replace(/\\.[^.]+$/, '').replace(/[_-]+/g, ' ')
-    .replace(/\\s+/g, ' ').trim()
+  var base = name.replace(/\\.[^.]+$/, '');
+  // Phone galleries hand over meaningless filenames — an asset UUID, IMG_0042,
+  // PXL_20260808, a screenshot. Turning those into a "title" puts gibberish on
+  // the site, so leave it blank and ask for a real one instead.
+  var junk = /^[0-9a-f]{8}-[0-9a-f-]{8,}$/i.test(base)
+    || /^(img|dsc|dscn|pxl|mvimg|photo|image|screenshot|scan|untitled)[\\s_-]*[\\d\\s_-]*$/i.test(base)
+    || /^\\d{6,}$/.test(base);
+  if (junk) return '';
+  return base.replace(/[_-]+/g, ' ').replace(/\\s+/g, ' ').trim()
     .replace(/\\b\\w/g, function(c){ return c.toUpperCase(); }).slice(0, 120);
 }
 
@@ -306,7 +326,10 @@ function render(){
 
     var f = el('div');
     f.innerHTML =
-      '<label>Title</label><input type="text" data-k="title" value="' + s.title.replace(/"/g, '&quot;') + '">' +
+      '<label>Title' + (s.title.trim() ? '' : ' — needed') + '</label>' +
+      '<input type="text" data-k="title" placeholder="Type a title for this painting"' +
+        (s.title.trim() ? '' : ' class="needed"') +
+        ' value="' + s.title.replace(/"/g, '&quot;') + '">' +
       '<div class="row">' +
         '<div><label>Category</label><select data-k="category">${cats}</select></div>' +
         '<div><label>Country</label><select data-k="region">${regs}</select></div>' +
@@ -389,6 +412,13 @@ document.getElementById('files').addEventListener('change', function(ev){
 
 document.getElementById('publish').addEventListener('click', function(){
   var btn = this, status = document.getElementById('status');
+  var unnamed = staged.filter(function(s){ return !String(s.title).trim(); }).length;
+  if (unnamed){
+    status.textContent = unnamed === 1
+      ? 'One painting still needs a title.'
+      : unnamed + ' paintings still need a title.';
+    return;
+  }
   btn.disabled = true;
   var done = 0, failed = [];
   staged.slice().reduce(function(chain, s){
@@ -424,10 +454,23 @@ function loadLive(){
       var row = el('div', 'live');
       var im = new Image(); im.src = w.img_url; row.appendChild(im);
       var g = el('div', 'g');
-      var t = el('div', 't'); t.textContent = w.title;
-      if(w.original_pending){ var p = el('span', 'pending', 'original needed'); t.appendChild(p); }
+      // editable in place, so a painting that arrived with a phone's filename
+      // as its title can be named without deleting and uploading it again
+      var t = document.createElement('input');
+      t.type = 'text'; t.className = 't'; t.value = w.title;
+      t.addEventListener('change', function(){
+        var v = t.value.trim();
+        if(!v || v === w.title){ t.value = w.title; return; }
+        t.disabled = true;
+        post({action:'rename', id: w.id, title: v}).then(function(res){
+          t.disabled = false;
+          if(res.ok){ w.title = v; } else { t.value = w.title; alert(res.error); }
+        });
+      });
+      g.appendChild(t);
       var d = el('div', 'd', w.category + (w.region ? ' · ' + w.region : '') + ' · ' + w.price + ' · ' + w.width + '×' + w.height);
-      g.appendChild(t); g.appendChild(d); row.appendChild(g);
+      if(w.original_pending){ d.appendChild(el('span', 'pending', 'original needed')); }
+      g.appendChild(d); row.appendChild(g);
       var b = el('button', 'btn ghost', 'Delete');
       b.addEventListener('click', function(){
         if(!confirm('Remove "' + w.title + '" from the site?')) return;
