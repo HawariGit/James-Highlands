@@ -154,6 +154,11 @@
     background:var(--hero-ink-dim);
     animation:scrollLine 2s ease-in-out infinite;
   }
+  @media(max-width:900px){
+    /* the sideways "Scroll" label collides with the intro text on a narrow
+       screen, and a touch device does not need to be told it can scroll */
+    .scroll-cue{display:none;}
+  }
   @keyframes scrollLine{
     0%{transform:scaleY(0);transform-origin:top;}
     50%{transform:scaleY(1);transform-origin:top;}
