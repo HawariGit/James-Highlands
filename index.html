@@ -360,8 +360,10 @@
     cursor:pointer;
   }
   .g-title{font-size:15px;letter-spacing:.03em;}
-  /* Medium label, driven off data-region so new works get it automatically */
-  .g-item[data-region="china"] .g-title::after{
+  /* Medium label, driven off data-style so new works get it automatically.
+     These are ink-wash works in a Chinese style, not paintings of China, so
+     they carry a style rather than a country. */
+  .g-item[data-style="chinese-ink"] .g-title::after{
     content:"Chinese Ink";
     display:block;
     font-size:12px;font-style:italic;
@@ -558,6 +560,7 @@
     <button class="filter-btn" data-type="category" data-filter="wildlife">Wildlife</button>
     <button class="filter-btn" data-type="category" data-filter="botanical">Botanical</button>
     <button class="filter-btn" data-type="category" data-filter="interior">Interior</button>
+    <button class="filter-btn" data-type="style" data-filter="chinese-ink">Chinese Ink</button>
   </div>
   <div class="dropdown" id="countryDrop">
     <button type="button" class="drop-toggle" id="countryToggle" aria-haspopup="true" aria-expanded="false">
@@ -1509,141 +1512,141 @@
     <div class="g-media"><img src="images/land/land-30-tulip-fields.webp" alt="Tulip Fields" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Tulip Fields</span><span class="g-cat">botanical</span></div><span class="g-price">$10</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="guilin li river karst mist mountains water boat ink wash shanshui china chinese ink" data-w="2048" data-h="1152" data-title="Li River Mist" data-price="$5" data-img="images/china/china-01-li-river-mist.webp">
-    <div class="g-media"><img src="images/china/china-01-li-river-mist.webp" alt="Li River Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Li River Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="karst mist mountains water boat ink wash shanshui chinese ink" data-w="2048" data-h="1152" data-title="Boat Through the Karst" data-price="$5" data-img="images/china/china-01-li-river-mist.webp">
+    <div class="g-media"><img src="images/china/china-01-li-river-mist.webp" alt="Boat Through the Karst" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Boat Through the Karst</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="china" data-tags="guilin karst peaks veil mist vertical scroll ink wash mountains china chinese ink" data-w="1152" data-h="2048" data-title="Karst Veil" data-price="$5" data-img="images/china/china-02-karst-veil.webp">
+  <div class="g-item gp" data-category="mountains" data-style="chinese-ink" data-tags="karst peaks veil mist vertical scroll ink wash mountains chinese ink" data-w="1152" data-h="2048" data-title="Karst Veil" data-price="$5" data-img="images/china/china-02-karst-veil.webp">
     <div class="g-media"><img src="images/china/china-02-karst-veil.webp" alt="Karst Veil" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Karst Veil</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="huangshan pine tree rock cliff wind mountains ink wash china chinese ink" data-w="2048" data-h="1152" data-title="The Windbearer Pine" data-price="$5" data-img="images/china/china-03-the-windbearer-pine.webp">
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="pine tree rock cliff wind mountains ink wash chinese ink" data-w="2048" data-h="1152" data-title="The Windbearer Pine" data-price="$5" data-img="images/china/china-03-the-windbearer-pine.webp">
     <div class="g-media"><img src="images/china/china-03-the-windbearer-pine.webp" alt="The Windbearer Pine" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">The Windbearer Pine</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="china" data-tags="huangshan pine solitude cliff rock mist vertical mountains ink china chinese ink" data-w="1152" data-h="2048" data-title="Solitude on Huangshan" data-price="$5" data-img="images/china/china-04-solitude-on-huangshan.webp">
-    <div class="g-media"><img src="images/china/china-04-solitude-on-huangshan.webp" alt="Solitude on Huangshan" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Solitude on Huangshan</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gp" data-category="mountains" data-style="chinese-ink" data-tags="pine solitude cliff rock mist vertical mountains ink chinese ink" data-w="1152" data-h="2048" data-title="Solitude Among the Peaks" data-price="$5" data-img="images/china/china-04-solitude-on-huangshan.webp">
+    <div class="g-media"><img src="images/china/china-04-solitude-on-huangshan.webp" alt="Solitude Among the Peaks" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Solitude Among the Peaks</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="zhangjiajie pillars stone columns mist mountains ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Zhangjiajie Pillars" data-price="$5" data-img="images/china/china-05-zhangjiajie-pillars.webp">
-    <div class="g-media"><img src="images/china/china-05-zhangjiajie-pillars.webp" alt="Zhangjiajie Pillars" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Zhangjiajie Pillars</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="pillars stone columns mist mountains ink wash chinese ink" data-w="2048" data-h="1152" data-title="Stone Pillars" data-price="$5" data-img="images/china/china-05-zhangjiajie-pillars.webp">
+    <div class="g-media"><img src="images/china/china-05-zhangjiajie-pillars.webp" alt="Stone Pillars" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Stone Pillars</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="china" data-tags="zhangjiajie floating peak pillar mist cloud vertical mountains china chinese ink" data-w="1152" data-h="2048" data-title="Floating Peak" data-price="$5" data-img="images/china/china-06-floating-peak.webp">
+  <div class="g-item gp" data-category="mountains" data-style="chinese-ink" data-tags="floating peak pillar mist cloud vertical mountains chinese ink" data-w="1152" data-h="2048" data-title="Floating Peak" data-price="$5" data-img="images/china/china-06-floating-peak.webp">
     <div class="g-media"><img src="images/china/china-06-floating-peak.webp" alt="Floating Peak" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Floating Peak</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="china" data-tags="bamboo valley empty minimal grass ink wash sumi-e plants china chinese ink" data-w="2048" data-h="1152" data-title="Bamboo in the Empty Valley" data-price="$5" data-img="images/china/china-07-bamboo-in-the-empty-valley.webp">
+  <div class="g-item gl" data-category="botanical" data-style="chinese-ink" data-tags="bamboo valley empty minimal grass ink wash sumi-e plants chinese ink" data-w="2048" data-h="1152" data-title="Bamboo in the Empty Valley" data-price="$5" data-img="images/china/china-07-bamboo-in-the-empty-valley.webp">
     <div class="g-media"><img src="images/china/china-07-bamboo-in-the-empty-valley.webp" alt="Bamboo in the Empty Valley" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Bamboo in the Empty Valley</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="botanical" data-region="china" data-tags="bamboo stalks slender vertical leaves ink wash sumi-e plants china chinese ink" data-w="1152" data-h="2048" data-title="Slender Grace" data-price="$5" data-img="images/china/china-08-slender-grace.webp">
+  <div class="g-item gp" data-category="botanical" data-style="chinese-ink" data-tags="bamboo stalks slender vertical leaves ink wash sumi-e plants chinese ink" data-w="1152" data-h="2048" data-title="Slender Grace" data-price="$5" data-img="images/china/china-08-slender-grace.webp">
     <div class="g-media"><img src="images/china/china-08-slender-grace.webp" alt="Slender Grace" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Slender Grace</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="rivers" data-region="china" data-tags="west lake reflection water calm island mist hangzhou ink wash china chinese ink" data-w="2048" data-h="1152" data-title="West Lake Reflection" data-price="$5" data-img="images/china/china-09-west-lake-reflection.webp">
-    <div class="g-media"><img src="images/china/china-09-west-lake-reflection.webp" alt="West Lake Reflection" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">West Lake Reflection</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="rivers" data-style="chinese-ink" data-tags="reflection water calm island mist ink wash chinese ink" data-w="2048" data-h="1152" data-title="Still Water Reflection" data-price="$5" data-img="images/china/china-09-west-lake-reflection.webp">
+    <div class="g-media"><img src="images/china/china-09-west-lake-reflection.webp" alt="Still Water Reflection" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Still Water Reflection</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="rivers" data-region="china" data-tags="west lake distant pagoda hill water mist hangzhou ink wash china chinese ink" data-w="1152" data-h="2048" data-title="West Lake, Distant" data-price="$5" data-img="images/china/china-10-west-lake-distant.webp">
-    <div class="g-media"><img src="images/china/china-10-west-lake-distant.webp" alt="West Lake, Distant" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">West Lake, Distant</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gp" data-category="rivers" data-style="chinese-ink" data-tags="distant pagoda hill water mist ink wash chinese ink" data-w="1152" data-h="2048" data-title="Distant Pagoda" data-price="$5" data-img="images/china/china-10-west-lake-distant.webp">
+    <div class="g-media"><img src="images/china/china-10-west-lake-distant.webp" alt="Distant Pagoda" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Distant Pagoda</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="china" data-tags="lotus water lily pond still leaves flower ink wash sumi-e china chinese ink" data-w="2048" data-h="1152" data-title="Lotus on Still Water" data-price="$5" data-img="images/china/china-11-lotus-on-still-water.webp">
+  <div class="g-item gl" data-category="botanical" data-style="chinese-ink" data-tags="lotus water lily pond still leaves flower ink wash sumi-e chinese ink" data-w="2048" data-h="1152" data-title="Lotus on Still Water" data-price="$5" data-img="images/china/china-11-lotus-on-still-water.webp">
     <div class="g-media"><img src="images/china/china-11-lotus-on-still-water.webp" alt="Lotus on Still Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Lotus on Still Water</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="botanical" data-region="china" data-tags="lotus single bloom flower stem leaves vertical ink wash china chinese ink" data-w="1152" data-h="2048" data-title="Single Lotus Bloom" data-price="$5" data-img="images/china/china-12-single-lotus-bloom.webp">
+  <div class="g-item gp" data-category="botanical" data-style="chinese-ink" data-tags="lotus single bloom flower stem leaves vertical ink wash chinese ink" data-w="1152" data-h="2048" data-title="Single Lotus Bloom" data-price="$5" data-img="images/china/china-12-single-lotus-bloom.webp">
     <div class="g-media"><img src="images/china/china-12-single-lotus-bloom.webp" alt="Single Lotus Bloom" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Single Lotus Bloom</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="china" data-tags="tea terraces layers fields curves farming hills ink wash china chinese ink" data-w="1920" data-h="1280" data-title="Tea Terraces in Layers" data-price="$5" data-img="images/china/china-13-tea-terraces-in-layers.webp">
+  <div class="g-item gl" data-category="countryside" data-style="chinese-ink" data-tags="tea terraces layers fields curves farming hills ink wash chinese ink" data-w="1920" data-h="1280" data-title="Tea Terraces in Layers" data-price="$5" data-img="images/china/china-13-tea-terraces-in-layers.webp">
     <div class="g-media"><img src="images/china/china-13-tea-terraces-in-layers.webp" alt="Tea Terraces in Layers" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Tea Terraces in Layers</span><span class="g-cat">countryside</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="countryside" data-region="china" data-tags="tea terraces mist fog fields vertical farming hills ink china chinese ink" data-w="1120" data-h="2240" data-title="Tea Terraces in Mist" data-price="$5" data-img="images/china/china-14-tea-terraces-in-mist.webp">
+  <div class="g-item gp" data-category="countryside" data-style="chinese-ink" data-tags="tea terraces mist fog fields vertical farming hills ink chinese ink" data-w="1120" data-h="2240" data-title="Tea Terraces in Mist" data-price="$5" data-img="images/china/china-14-tea-terraces-in-mist.webp">
     <div class="g-media"><img src="images/china/china-14-tea-terraces-in-mist.webp" alt="Tea Terraces in Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Tea Terraces in Mist</span><span class="g-cat">countryside</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="botanical" data-region="china" data-tags="bamboo stalks leaves study vertical ink wash sumi-e plants china chinese ink" data-w="1152" data-h="2048" data-title="Bamboo Study" data-price="$5" data-img="images/china/china-15-bamboo-study.webp">
+  <div class="g-item gp" data-category="botanical" data-style="chinese-ink" data-tags="bamboo stalks leaves study vertical ink wash sumi-e plants chinese ink" data-w="1152" data-h="2048" data-title="Bamboo Study" data-price="$5" data-img="images/china/china-15-bamboo-study.webp">
     <div class="g-media"><img src="images/china/china-15-bamboo-study.webp" alt="Bamboo Study" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Bamboo Study</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="emei golden summit temple pagoda mountains mist peaks ink china chinese ink" data-w="2048" data-h="1152" data-title="Emei Golden Summit" data-price="$5" data-img="images/china/china-16-emei-golden-summit.webp">
-    <div class="g-media"><img src="images/china/china-16-emei-golden-summit.webp" alt="Emei Golden Summit" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Emei Golden Summit</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="golden summit temple pagoda mountains mist peaks ink chinese ink" data-w="2048" data-h="1152" data-title="Temple Above the Clouds" data-price="$5" data-img="images/china/china-16-emei-golden-summit.webp">
+    <div class="g-media"><img src="images/china/china-16-emei-golden-summit.webp" alt="Temple Above the Clouds" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Temple Above the Clouds</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="botanical" data-region="china" data-tags="ginkgo tree blossom minimal branch white flowers ink wash china chinese ink" data-w="1152" data-h="2048" data-title="Ginkgo, Minimal" data-price="$5" data-img="images/china/china-17-ginkgo-minimal.webp">
+  <div class="g-item gp" data-category="botanical" data-style="chinese-ink" data-tags="ginkgo tree blossom minimal branch white flowers ink wash chinese ink" data-w="1152" data-h="2048" data-title="Ginkgo, Minimal" data-price="$5" data-img="images/china/china-17-ginkgo-minimal.webp">
     <div class="g-media"><img src="images/china/china-17-ginkgo-minimal.webp" alt="Ginkgo, Minimal" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Ginkgo, Minimal</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="guilin peaks karst mountains ink wash landscape distant china chinese ink" data-w="2048" data-h="1152" data-title="Guilin Peaks" data-price="$5" data-img="images/china/china-18-guilin-peaks.webp">
-    <div class="g-media"><img src="images/china/china-18-guilin-peaks.webp" alt="Guilin Peaks" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Guilin Peaks</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="peaks karst mountains ink wash landscape distant chinese ink" data-w="2048" data-h="1152" data-title="Karst Peaks" data-price="$5" data-img="images/china/china-18-guilin-peaks.webp">
+    <div class="g-media"><img src="images/china/china-18-guilin-peaks.webp" alt="Karst Peaks" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Karst Peaks</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="guilin karst mist mountains peaks fog river ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Guilin Karst in Mist" data-price="$5" data-img="images/china/china-19-guilin-karst-in-mist.webp">
-    <div class="g-media"><img src="images/china/china-19-guilin-karst-in-mist.webp" alt="Guilin Karst in Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Guilin Karst in Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="karst mist mountains peaks fog river ink wash chinese ink" data-w="2048" data-h="1152" data-title="Karst in Mist" data-price="$5" data-img="images/china/china-19-guilin-karst-in-mist.webp">
+    <div class="g-media"><img src="images/china/china-19-guilin-karst-in-mist.webp" alt="Karst in Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Karst in Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="huangshan pine tree mist cliff rock mountains ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Huangshan Pine" data-price="$5" data-img="images/china/china-20-huangshan-pine.webp">
-    <div class="g-media"><img src="images/china/china-20-huangshan-pine.webp" alt="Huangshan Pine" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Huangshan Pine</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="pine tree mist cliff rock mountains ink wash chinese ink" data-w="2048" data-h="1152" data-title="Pine on the Cliff" data-price="$5" data-img="images/china/china-20-huangshan-pine.webp">
+    <div class="g-media"><img src="images/china/china-20-huangshan-pine.webp" alt="Pine on the Cliff" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Pine on the Cliff</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="huangshan pine tree mist cliff dark rock mountains ink china chinese ink" data-w="2048" data-h="1152" data-title="Huangshan Pine II" data-price="$5" data-img="images/china/china-21-huangshan-pine-ii.webp">
-    <div class="g-media"><img src="images/china/china-21-huangshan-pine-ii.webp" alt="Huangshan Pine II" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Huangshan Pine II</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="pine tree mist cliff dark rock mountains ink chinese ink" data-w="2048" data-h="1152" data-title="Pine on the Cliff II" data-price="$5" data-img="images/china/china-21-huangshan-pine-ii.webp">
+    <div class="g-media"><img src="images/china/china-21-huangshan-pine-ii.webp" alt="Pine on the Cliff II" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Pine on the Cliff II</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="jiuzhaigou mist valley village mountains fog ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Jiuzhaigou Mist" data-price="$5" data-img="images/china/china-22-jiuzhaigou-mist.webp">
-    <div class="g-media"><img src="images/china/china-22-jiuzhaigou-mist.webp" alt="Jiuzhaigou Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Jiuzhaigou Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="mist valley village mountains fog ink wash chinese ink" data-w="2048" data-h="1152" data-title="Village in the Valley Mist" data-price="$5" data-img="images/china/china-22-jiuzhaigou-mist.webp">
+    <div class="g-media"><img src="images/china/china-22-jiuzhaigou-mist.webp" alt="Village in the Valley Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Village in the Valley Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="china" data-tags="lotus pink flower pond leaves water ink wash sumi-e china chinese ink" data-w="2048" data-h="1152" data-title="Lotus Pond" data-price="$5" data-img="images/china/china-23-lotus-pond.webp">
+  <div class="g-item gl" data-category="botanical" data-style="chinese-ink" data-tags="lotus pink flower pond leaves water ink wash sumi-e chinese ink" data-w="2048" data-h="1152" data-title="Lotus Pond" data-price="$5" data-img="images/china/china-23-lotus-pond.webp">
     <div class="g-media"><img src="images/china/china-23-lotus-pond.webp" alt="Lotus Pond" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Lotus Pond</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="botanical" data-region="china" data-tags="lotus leaf pale minimal water plant ink wash sumi-e china chinese ink" data-w="2048" data-h="1152" data-title="Lotus Leaf" data-price="$5" data-img="images/china/china-24-lotus-leaf.webp">
+  <div class="g-item gl" data-category="botanical" data-style="chinese-ink" data-tags="lotus leaf pale minimal water plant ink wash sumi-e chinese ink" data-w="2048" data-h="1152" data-title="Lotus Leaf" data-price="$5" data-img="images/china/china-24-lotus-leaf.webp">
     <div class="g-media"><img src="images/china/china-24-lotus-leaf.webp" alt="Lotus Leaf" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Lotus Leaf</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="botanical" data-region="china" data-tags="bamboo minimal stalks leaves vertical ink wash sumi-e china chinese ink" data-w="1152" data-h="2048" data-title="Minimalist Bamboo" data-price="$5" data-img="images/china/china-25-minimalist-bamboo.webp">
+  <div class="g-item gp" data-category="botanical" data-style="chinese-ink" data-tags="bamboo minimal stalks leaves vertical ink wash sumi-e chinese ink" data-w="1152" data-h="2048" data-title="Minimalist Bamboo" data-price="$5" data-img="images/china/china-25-minimalist-bamboo.webp">
     <div class="g-media"><img src="images/china/china-25-minimalist-bamboo.webp" alt="Minimalist Bamboo" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Minimalist Bamboo</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="china" data-tags="karst pillars mist columns stone vertical mountains ink china chinese ink" data-w="1152" data-h="2048" data-title="Misty Karst Pillars" data-price="$5" data-img="images/china/china-26-misty-karst-pillars.webp">
+  <div class="g-item gp" data-category="mountains" data-style="chinese-ink" data-tags="karst pillars mist columns stone vertical mountains ink chinese ink" data-w="1152" data-h="2048" data-title="Misty Karst Pillars" data-price="$5" data-img="images/china/china-26-misty-karst-pillars.webp">
     <div class="g-media"><img src="images/china/china-26-misty-karst-pillars.webp" alt="Misty Karst Pillars" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Misty Karst Pillars</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="wildlife" data-region="china" data-tags="panda bear bamboo animal wildlife mist grass ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Panda in Bamboo" data-price="$5" data-img="images/china/china-27-panda-in-bamboo.webp">
+  <div class="g-item gl" data-category="wildlife" data-style="chinese-ink" data-tags="panda bear bamboo animal wildlife mist grass ink wash chinese ink" data-w="2048" data-h="1152" data-title="Panda in Bamboo" data-price="$5" data-img="images/china/china-27-panda-in-bamboo.webp">
     <div class="g-media"><img src="images/china/china-27-panda-in-bamboo.webp" alt="Panda in Bamboo" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
     <div class="g-meta"><div><span class="g-title">Panda in Bamboo</span><span class="g-cat">wildlife</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="botanical" data-region="china" data-tags="sakura cherry blossom branch flowers spring ink wash china chinese ink" data-w="1152" data-h="2048" data-title="Sakura Branch" data-price="$5" data-img="images/china/china-28-sakura-branch.webp">
-    <div class="g-media"><img src="images/china/china-28-sakura-branch.webp" alt="Sakura Branch" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Sakura Branch</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gp" data-category="botanical" data-style="chinese-ink" data-tags="sakura cherry blossom branch flowers spring ink wash chinese ink" data-w="1152" data-h="2048" data-title="Cherry Blossom Branch" data-price="$5" data-img="images/china/china-28-sakura-branch.webp">
+    <div class="g-media"><img src="images/china/china-28-sakura-branch.webp" alt="Cherry Blossom Branch" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Cherry Blossom Branch</span><span class="g-cat">botanical</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="mountains" data-region="china" data-tags="three gorges cliffs river mist yangtze gorge mountains ink china chinese ink" data-w="2048" data-h="1152" data-title="Three Gorges Mist" data-price="$5" data-img="images/china/china-29-three-gorges-mist.webp">
-    <div class="g-media"><img src="images/china/china-29-three-gorges-mist.webp" alt="Three Gorges Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Three Gorges Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="mountains" data-style="chinese-ink" data-tags="cliffs river mist gorge mountains ink chinese ink" data-w="2048" data-h="1152" data-title="Mist in the Gorge" data-price="$5" data-img="images/china/china-29-three-gorges-mist.webp">
+    <div class="g-media"><img src="images/china/china-29-three-gorges-mist.webp" alt="Mist in the Gorge" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Mist in the Gorge</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="rivers" data-region="china" data-tags="west lake willow tree pagoda water reflection hangzhou ink china chinese ink" data-w="2048" data-h="1152" data-title="West Lake Willows" data-price="$5" data-img="images/china/china-30-west-lake-willows.webp">
-    <div class="g-media"><img src="images/china/china-30-west-lake-willows.webp" alt="West Lake Willows" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">West Lake Willows</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="rivers" data-style="chinese-ink" data-tags="willow tree pagoda water reflection ink chinese ink" data-w="2048" data-h="1152" data-title="Willows at the Water's Edge" data-price="$5" data-img="images/china/china-30-west-lake-willows.webp">
+    <div class="g-media"><img src="images/china/china-30-west-lake-willows.webp" alt="Willows at the Water's Edge" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Willows at the Water's Edge</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="rivers" data-region="china" data-tags="west lake shanshui willow pagoda island water reflection ink china chinese ink" data-w="2048" data-h="1152" data-title="West Lake Shanshui" data-price="$5" data-img="images/china/china-31-west-lake-shanshui.webp">
-    <div class="g-media"><img src="images/china/china-31-west-lake-shanshui.webp" alt="West Lake Shanshui" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">West Lake Shanshui</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="rivers" data-style="chinese-ink" data-tags="shanshui willow pagoda island water reflection ink chinese ink" data-w="2048" data-h="1152" data-title="Island in Still Water" data-price="$5" data-img="images/china/china-31-west-lake-shanshui.webp">
+    <div class="g-media"><img src="images/china/china-31-west-lake-shanshui.webp" alt="Island in Still Water" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Island in Still Water</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="countryside" data-region="china" data-tags="wuyi tea terraces curves fields layers farming ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Wuyi Tea Terraces" data-price="$5" data-img="images/china/china-32-wuyi-tea-terraces.webp">
-    <div class="g-media"><img src="images/china/china-32-wuyi-tea-terraces.webp" alt="Wuyi Tea Terraces" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Wuyi Tea Terraces</span><span class="g-cat">countryside</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="countryside" data-style="chinese-ink" data-tags="tea terraces curves fields layers farming ink wash chinese ink" data-w="2048" data-h="1152" data-title="Terraced Hillside" data-price="$5" data-img="images/china/china-32-wuyi-tea-terraces.webp">
+    <div class="g-media"><img src="images/china/china-32-wuyi-tea-terraces.webp" alt="Terraced Hillside" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Terraced Hillside</span><span class="g-cat">countryside</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gl" data-category="rivers" data-region="china" data-tags="yellow river winding water meander sumi-e minimal ink wash china chinese ink" data-w="2048" data-h="1152" data-title="Yellow River" data-price="$5" data-img="images/china/china-33-yellow-river.webp">
-    <div class="g-media"><img src="images/china/china-33-yellow-river.webp" alt="Yellow River" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Yellow River</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gl" data-category="rivers" data-style="chinese-ink" data-tags="winding water meander sumi-e minimal ink wash chinese ink" data-w="2048" data-h="1152" data-title="The Winding River" data-price="$5" data-img="images/china/china-33-yellow-river.webp">
+    <div class="g-media"><img src="images/china/china-33-yellow-river.webp" alt="The Winding River" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">The Winding River</span><span class="g-cat">rivers</span></div><span class="g-price">$5</span></div>
   </div>
-  <div class="g-item gp" data-category="mountains" data-region="china" data-tags="zhangjiajie pillars mist columns stone vertical mountains ink china chinese ink" data-w="1152" data-h="2048" data-title="Zhangjiajie in Mist" data-price="$5" data-img="images/china/china-34-zhangjiajie-in-mist.webp">
-    <div class="g-media"><img src="images/china/china-34-zhangjiajie-in-mist.webp" alt="Zhangjiajie in Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
-    <div class="g-meta"><div><span class="g-title">Zhangjiajie in Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
+  <div class="g-item gp" data-category="mountains" data-style="chinese-ink" data-tags="pillars mist columns stone vertical mountains ink chinese ink" data-w="1152" data-h="2048" data-title="Stone Columns in Mist" data-price="$5" data-img="images/china/china-34-zhangjiajie-in-mist.webp">
+    <div class="g-media"><img src="images/china/china-34-zhangjiajie-in-mist.webp" alt="Stone Columns in Mist" draggable="false" loading="lazy" decoding="async"><div class="g-watermark"></div></div>
+    <div class="g-meta"><div><span class="g-title">Stone Columns in Mist</span><span class="g-cat">mountains</span></div><span class="g-price">$5</span></div>
   </div>
   <div class="no-results" id="noResults">No paintings match your search.</div>
 </div>
@@ -1800,6 +1803,7 @@
       let inFilter;
       if (type === 'category') inFilter = item.dataset.category === val;
       else if (type === 'region') inFilter = item.dataset.region === val;
+      else if (type === 'style') inFilter = item.dataset.style === val;
       else inFilter = true; // all
       const haystack = (item.dataset.title + ' ' + item.dataset.category + ' ' + (item.dataset.region || '') + ' ' + (item.dataset.tags || '')).toLowerCase();
       const inSearch = query === '' || haystack.includes(query);
@@ -1978,6 +1982,7 @@
       card.className = 'g-item ' + (w.height > w.width ? 'gp' : 'gl');
       card.dataset.category = w.category || 'landscape';
       if (w.region) card.dataset.region = w.region;
+      if (w.style) card.dataset.style = w.style;   // e.g. chinese-ink
       card.dataset.tags = w.tags || '';
       card.dataset.w = w.width;
       card.dataset.h = w.height;

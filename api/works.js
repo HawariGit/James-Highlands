@@ -27,6 +27,9 @@ export async function ensureWorksTable(sql) {
     original_pending BOOLEAN NOT NULL DEFAULT true,
     hidden BOOLEAN NOT NULL DEFAULT false
   )`;
+  // painting style, kept separate from region: a Chinese ink work is not a
+  // painting of China
+  await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS style TEXT`;
   await sql`ALTER TABLE works ENABLE ROW LEVEL SECURITY`;
 }
 
@@ -34,7 +37,7 @@ export default async function handler(req, res) {
   try {
     const sql = getSql();
     await ensureWorksTable(sql);
-    const rows = await sql`SELECT id, title, category, region, tags, price, width, height, img_url
+    const rows = await sql`SELECT id, title, category, region, style, tags, price, width, height, img_url
       FROM works WHERE hidden = false ORDER BY created_at DESC`;
     // short cache: new uploads should show up quickly, but not every visitor
     // needs to hit the database

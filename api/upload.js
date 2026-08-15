@@ -30,7 +30,10 @@ const slug = (s) => String(s || 'work').toLowerCase()
 
 const CATEGORIES = ['mountains', 'villages', 'wadis', 'botanical', 'countryside',
   'coast', 'rivers', 'wildlife', 'cars', 'landscape', 'interior'];
-const REGIONS = ['', 'oman', 'china', 'scotland', 'france', 'italy', 'uk', 'usa', 'uae'];
+// "china" is deliberately absent: the ink-wash works are a style, not a place,
+// and no painting on the site depicts China. Add it back if that changes.
+const REGIONS = ['', 'oman', 'scotland', 'france', 'italy', 'uk', 'usa', 'uae'];
+const STYLES = [['', '— none —'], ['chinese-ink', 'Chinese Ink']];
 
 function deny(res) {
   res.status(401).setHeader('content-type', 'text/html');
@@ -54,7 +57,7 @@ async function handlePost(req, res) {
     await ensureWorksTable(sql);
 
     if (body.action === 'list') {
-      const rows = await sql`SELECT id, title, category, region, price, width, height, img_url,
+      const rows = await sql`SELECT id, title, category, region, style, price, width, height, img_url,
         phash, original_pending, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
       return res.status(200).json({ ok: true, works: rows });
     }
@@ -97,6 +100,7 @@ async function handlePost(req, res) {
 
       const category = CATEGORIES.includes(body.category) ? body.category : 'landscape';
       const region = REGIONS.includes(body.region) ? (body.region || null) : null;
+      const style = STYLES.some(s => s[0] === body.style) ? (body.style || null) : null;
       const price = /^\$\d+$/.test(String(body.price)) ? String(body.price) : '$5';
       const tags = String(body.tags || '').trim().slice(0, 400) || null;
       const phash = /^[01]{64}$/.test(String(body.phash || '')) ? String(body.phash) : null;
@@ -105,8 +109,8 @@ async function handlePost(req, res) {
       const blob = await put(name, buf, { access: 'public', contentType: 'image/' + fmt });
 
       const [row] = await sql`INSERT INTO works
-        (title, category, region, tags, price, width, height, img_url, phash)
-        VALUES (${title}, ${category}, ${region}, ${tags}, ${price}, ${width}, ${height}, ${blob.url}, ${phash})
+        (title, category, region, style, tags, price, width, height, img_url, phash)
+        VALUES (${title}, ${category}, ${region}, ${style}, ${tags}, ${price}, ${width}, ${height}, ${blob.url}, ${phash})
         RETURNING id`;
       return res.status(200).json({ ok: true, id: row.id, url: blob.url });
     }
@@ -119,7 +123,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v4';
+const PAGE_VERSION = 'v5';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -130,6 +134,7 @@ function page(pw) {
 
   const cats = CATEGORIES.map(c => '<option value="' + c + '">' + c + '</option>').join('');
   const regs = REGIONS.map(r => '<option value="' + r + '">' + (r || '— none —') + '</option>').join('');
+  const stys = STYLES.map(s => '<option value="' + s[0] + '">' + s[1] + '</option>').join('');
 
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -333,6 +338,9 @@ function render(){
       '<div class="row">' +
         '<div><label>Category</label><select data-k="category">${cats}</select></div>' +
         '<div><label>Country</label><select data-k="region">${regs}</select></div>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div><label>Style</label><select data-k="style">${stys}</select></div>' +
         '<div><label>Price</label><select data-k="price"><option>$5</option><option>$10</option></select></div>' +
       '</div>' +
       '<label>Search words (optional)</label><input type="text" data-k="tags" value="' + s.tags.replace(/"/g, '&quot;') + '">' +
@@ -340,6 +348,7 @@ function render(){
 
     f.querySelector('[data-k=category]').value = s.category;
     f.querySelector('[data-k=region]').value = s.region;
+    f.querySelector('[data-k=style]').value = s.style;
     f.querySelector('[data-k=price]').value = s.price;
     f.querySelectorAll('[data-k]').forEach(function(inp){
       inp.addEventListener('input', function(){ staged[idx][inp.dataset.k] = inp.value; });
@@ -389,6 +398,7 @@ document.getElementById('files').addEventListener('change', function(ev){
           title: titleFromName(file.name),
           category: 'landscape',
           region: '',
+          style: '',
           price: suggestPrice(r.img.naturalWidth, r.img.naturalHeight),
           tags: '',
           width: r.img.naturalWidth,
@@ -425,7 +435,7 @@ document.getElementById('publish').addEventListener('click', function(){
     return chain.then(function(){
       status.textContent = 'Uploading ' + (done + 1) + ' of ' + staged.length + '…';
       return post({
-        action: 'save', title: s.title, category: s.category, region: s.region,
+        action: 'save', title: s.title, category: s.category, region: s.region, style: s.style,
         price: s.price, tags: s.tags, width: s.width, height: s.height,
         image: s.display, phash: s.phash
       }).then(function(r){
@@ -468,7 +478,9 @@ function loadLive(){
         });
       });
       g.appendChild(t);
-      var d = el('div', 'd', w.category + (w.region ? ' · ' + w.region : '') + ' · ' + w.price + ' · ' + w.width + '×' + w.height);
+      var d = el('div', 'd', w.category + (w.region ? ' · ' + w.region : '') +
+        (w.style ? ' · ' + w.style.replace(/-/g, ' ') : '') +
+        ' · ' + w.price + ' · ' + w.width + '×' + w.height);
       if(w.original_pending){ d.appendChild(el('span', 'pending', 'original needed')); }
       g.appendChild(d); row.appendChild(g);
       var b = el('button', 'btn ghost', 'Delete');
