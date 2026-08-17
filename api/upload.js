@@ -29,7 +29,8 @@ const slug = (s) => String(s || 'work').toLowerCase()
   .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'work';
 
 const CATEGORIES = ['mountains', 'villages', 'wadis', 'botanical', 'countryside',
-  'coast', 'rivers', 'wildlife', 'cars', 'landscape', 'interior'];
+  'coast', 'rivers', 'wildlife', 'cars', 'landscape', 'interior',
+  'abstraction', 'nightlife'];
 // "china" is deliberately absent: the ink-wash works are a style, not a place,
 // and no painting on the site depicts China. Add it back if that changes.
 const REGIONS = ['', 'oman', 'scotland', 'france', 'italy', 'uk', 'usa', 'uae'];
@@ -123,7 +124,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v5';
+const PAGE_VERSION = 'v6';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
