@@ -39,6 +39,55 @@ const STYLES = [['', '— none —'], ['chinese-ink', 'Chinese Ink']];
 // what it can be overridden to by hand
 const PRICES = ['$1', '$2', '$3', '$5', '$10'];
 
+// Title suggestions. The page picks from the pool for the chosen category and
+// mixes in one drawn from the picture's own colour and brightness, so the
+// offered names suit what was actually uploaded. Written to sit alongside the
+// existing titles rather than stand out from them.
+const NAME_POOLS = {
+  mountains: ['Distant Ridge', 'The High Pass', 'Peaks in Cloud', 'Above the Valley',
+    'Morning on the Ridge', 'Shoulder of the Hill', 'Where the Ridges Meet',
+    'The Long Ascent', 'Cloud Below the Summit', 'Blue Mountain Light'],
+  villages: ['Roofs in the Morning', 'The Quiet Lane', 'Houses on the Slope',
+    'Where the Path Turns', 'Doorway and Shade', 'Rooftops and Palms',
+    'The Village Wall', 'Evening in the Village', 'Stone and Shadow', 'The Narrow Street'],
+  wadis: ['Between the Walls', 'The Narrow Canyon', 'Water in the Gorge',
+    'Shade of the Canyon', 'The Still Pool', 'Where the Wadi Bends',
+    'Cool Water, High Walls', 'The Hidden Pool', 'Deep in the Gorge'],
+  botanical: ['Petals and Light', 'A Single Stem', 'In the Quiet Border', 'Blossom Study',
+    'Leaves in the Morning', 'The Flowering Branch', 'Wild Stems', 'Colour in the Grass',
+    'Study of a Bloom'],
+  countryside: ['Fields in Layers', 'The Long Furrow', 'Harvest Light',
+    'Track Through the Fields', 'Hedgerow and Sky', 'The Open Field',
+    'Farmland in Summer', 'Where the Fields Meet'],
+  coast: ['The Tide Line', 'Rocks and Spray', 'Where the Sea Meets Stone',
+    'Boats at Rest', 'Low Tide, Long Light', 'The Quiet Shore', 'Headland in Haze'],
+  rivers: ['The Slow Bend', 'Reflections Downstream', 'Stones in the Shallows',
+    'Where the River Widens', 'Morning on the Water', 'The Still Reach'],
+  wildlife: ['Watchful', "At the Water's Edge", 'In the Long Grass', 'Stillness',
+    'The Visitor', 'Among the Branches'],
+  cars: ['Chrome and Shadow', 'Parked in the Sun', 'The Long Bonnet', 'Curves in Steel',
+    'Waiting at the Kerb', 'Polished Lines'],
+  landscape: ['Open Country', 'The Wide View', 'Light Across the Land',
+    'Distance and Air', 'Under a Big Sky', 'The Far Ground'],
+  interior: ['The Quiet Room', 'Light Through the Window', 'Chair and Shadow',
+    'Where the Books Are', 'Morning Indoors'],
+  abstraction: ['Colour Field', 'Drift', 'Soft Collision', 'Weight and Air',
+    'Quiet Static', 'Fold', 'Undercurrent', 'Two Movements', 'Interruption', 'Slow Bloom'],
+  nightlife: ['Neon on Wet Streets', 'After Midnight', 'The Late Window', 'Lights and Rain',
+    'Closing Time', 'Signs in the Dark', 'Streetlight and Shadow', 'The Long Night',
+    'Last Orders', 'City After Rain'],
+};
+
+const TONE_POOLS = {
+  dark:   ['Last Light', 'After Dusk', 'The Blue Hour', 'Night Coming In', 'Shadow and Quiet'],
+  bright: ['Full Light', 'High Summer', 'Open and Bright', 'Air and Light', 'The Pale Hour'],
+  warm:   ['Warm Ground', 'Ochre and Rust', 'The Red Hour', 'Sunlit Earth'],
+  gold:   ['Gold in the Grass', 'Harvest Gold', 'Late Amber', 'The Yellow Field'],
+  green:  ['Deep Green', 'Green Shade', 'New Growth', 'The Green Hollow'],
+  blue:   ['Cool Water', 'Blue Distance', 'Still and Blue', 'Water and Air'],
+  purple: ['Lavender Light', 'Violet Hour', 'Purple Ground', 'Heather and Haze'],
+};
+
 function deny(res) {
   res.status(401).setHeader('content-type', 'text/html');
   res.send('<body style="font-family:system-ui;background:#211f1c;color:#FFF2DB;display:flex;height:100vh;align-items:center;justify-content:center;margin:0"><div>401 — Unauthorized</div></body>');
@@ -129,7 +178,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v7';
+const PAGE_VERSION = 'v8';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -190,6 +239,12 @@ function page(pw) {
   .live .t:hover{border-color:var(--line);background:#fff;}
   .live .t:focus{border-color:var(--accent);background:#fff;outline:none;}
   input.needed{border-color:#c0392b;background:#fff6f5;}
+  .sugg{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+  .sugg button{font-family:Georgia,serif;font-size:13px;padding:6px 10px;cursor:pointer;
+    border:1px solid var(--line);background:#fff;color:var(--ink);}
+  .sugg button:hover{border-color:var(--accent);color:var(--accent);}
+  .sugg button.more{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--dim);background:none;}
   .live .d{font-size:11px;color:var(--dim);margin-top:2px;}
   .pending{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);
     color:#fff;padding:2px 6px;margin-left:6px;}
@@ -224,6 +279,8 @@ ${setupNote}
 <script>
 var PW = ${JSON.stringify(pw)};
 var PRICES = ${JSON.stringify(PRICES)};
+var NAME_POOLS = ${JSON.stringify(NAME_POOLS)};
+var TONE_POOLS = ${JSON.stringify(TONE_POOLS)};
 var MAX = 1400;              // display copies are capped at 1400px, same as the rest of the site
 var MIN_DPI = 170;           // matches the gallery: no soft or stretched prints
 var A3 = [11.69, 16.54];
@@ -269,6 +326,72 @@ function titleFromName(name){
   if (junk) return '';
   return base.replace(/[_-]+/g, ' ').replace(/\\s+/g, ' ').trim()
     .replace(/\\b\\w/g, function(c){ return c.toUpperCase(); }).slice(0, 120);
+}
+
+// Reads the picture's overall colour and brightness, so suggested names can
+// suit a dark night scene or a purple lavender field rather than being generic.
+function traitsOf(img){
+  var c = document.createElement('canvas'); c.width = 48; c.height = 48;
+  var x = c.getContext('2d'); x.drawImage(img, 0, 0, 48, 48);
+  var d = x.getImageData(0, 0, 48, 48).data;
+  var n = 48 * 48, sumL = 0, sumC = 0, bins = [0, 0, 0, 0, 0], i;
+  for(i = 0; i < n; i++){
+    var r = d[i*4]/255, g = d[i*4+1]/255, b = d[i*4+2]/255;
+    var mx = Math.max(r,g,b), mn = Math.min(r,g,b), l = (mx+mn)/2;
+    // chroma, not HSL saturation: HSL saturation shoots up near white, which
+    // made pale ink washes read as strongly coloured
+    var chroma = mx - mn;
+    sumL += l; sumC += chroma;
+    if(chroma > 0){
+      var h;
+      if(mx === r) h = (g-b)/chroma + (g < b ? 6 : 0);
+      else if(mx === g) h = (b-r)/chroma + 2;
+      else h = (r-g)/chroma + 4;
+      h *= 60;
+      var k = h < 45 ? 0 : h < 70 ? 1 : h < 160 ? 2 : h < 250 ? 3 : h < 315 ? 4 : 0;
+      bins[k] += chroma;                  // near-grey pixels barely vote
+    }
+  }
+  var dom = 0, j;
+  for(j = 1; j < 5; j++){ if(bins[j] > bins[dom]) dom = j; }
+  return {
+    light: sumL / n,
+    chroma: sumC / n,
+    hue: ['warm','gold','green','blue','purple'][dom]
+  };
+}
+
+function toneKey(t){
+  if(t.light < 0.32) return 'dark';
+  if(t.chroma < 0.12) return t.light > 0.55 ? 'bright' : 'dark';  // barely any colour
+  if(t.light > 0.82) return 'bright';
+  return t.hue;
+}
+
+function pick(arr, taken, count){
+  var pool = arr.filter(function(n){ return taken.indexOf(n.toLowerCase()) < 0; });
+  var out = [];
+  while(out.length < count && pool.length){
+    out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+  return out;
+}
+
+// Three names from the category, with one swapped for a mood name only when the
+// picture actually has a strong one. A washed-out photo of a car does not want
+// to be called "High Summer".
+var NO_MOOD = ['cars', 'interior'];
+
+function suggestNames(s){
+  var taken = existingHashes.map(function(e){ return String(e.title || '').toLowerCase(); })
+    .concat(staged.map(function(x){ return String(x.title || '').toLowerCase(); }));
+  var cat = NAME_POOLS[s.category] || NAME_POOLS.landscape;
+  var t = s.traits || {light: 0.5, chroma: 0, hue: 'warm'};
+  var key = toneKey(t);
+  var strong = (key === 'dark') || (t.chroma >= 0.15);
+  var useMood = strong && NO_MOOD.indexOf(s.category) < 0;
+  if(!useMood) return pick(cat, taken, 3);
+  return pick(cat, taken, 2).concat(pick(TONE_POOLS[key] || [], taken, 1));
 }
 
 // 8x8 average hash — cheap and good enough to catch the same photo uploaded twice
@@ -339,9 +462,10 @@ function render(){
     var f = el('div');
     f.innerHTML =
       '<label>Title' + (s.title.trim() ? '' : ' — needed') + '</label>' +
-      '<input type="text" data-k="title" placeholder="Type a title for this painting"' +
+      '<input type="text" data-k="title" placeholder="Tap a suggestion below, or type your own"' +
         (s.title.trim() ? '' : ' class="needed"') +
         ' value="' + s.title.replace(/"/g, '&quot;') + '">' +
+      '<div class="sugg"></div>' +
       '<div class="row">' +
         '<div><label>Category</label><select data-k="category">${cats}</select></div>' +
         '<div><label>Country</label><select data-k="region">${regs}</select></div>' +
@@ -361,8 +485,34 @@ function render(){
     f.querySelector('[data-k=price]').value = s.price;
     f.querySelectorAll('[data-k]').forEach(function(inp){
       inp.addEventListener('input', function(){ staged[idx][inp.dataset.k] = inp.value; });
-      inp.addEventListener('change', function(){ staged[idx][inp.dataset.k] = inp.value; });
+      inp.addEventListener('change', function(){
+        staged[idx][inp.dataset.k] = inp.value;
+        // a different category means different names are appropriate
+        if(inp.dataset.k === 'category'){
+          staged[idx].suggestions = suggestNames(staged[idx]);
+          render();
+        }
+      });
     });
+
+    // tappable name suggestions
+    var sg = f.querySelector('.sugg');
+    (s.suggestions || []).forEach(function(name){
+      var b = el('button', null, name);
+      b.type = 'button';
+      b.addEventListener('click', function(){
+        staged[idx].title = name;
+        render();
+      });
+      sg.appendChild(b);
+    });
+    var more = el('button', 'more', '↻ other names');
+    more.type = 'button';
+    more.addEventListener('click', function(){
+      staged[idx].suggestions = suggestNames(staged[idx]);
+      render();
+    });
+    sg.appendChild(more);
 
     if(s.dupeOf){
       var d = el('div', 'dupe');
@@ -415,8 +565,11 @@ document.getElementById('files').addEventListener('change', function(ev){
           display: makeDisplay(r.img),
           corner: cornerCrop(r.img),
           phash: hash,
+          traits: traitsOf(r.img),
           dupeOf: dupe
         });
+        var last = staged[staged.length - 1];
+        last.suggestions = suggestNames(last);
         URL.revokeObjectURL(r.url);
         render();
       });
