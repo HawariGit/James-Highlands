@@ -35,6 +35,9 @@ const CATEGORIES = ['mountains', 'villages', 'wadis', 'botanical', 'countryside'
 // and no painting on the site depicts China. Add it back if that changes.
 const REGIONS = ['', 'oman', 'scotland', 'france', 'italy', 'uk', 'usa', 'uae'];
 const STYLES = [['', '— none —'], ['chinese-ink', 'Chinese Ink']];
+// suggestPrice() still proposes $5 or $10 from the file's resolution; these are
+// what it can be overridden to by hand
+const PRICES = ['$1', '$2', '$3', '$5', '$10'];
 
 function deny(res) {
   res.status(401).setHeader('content-type', 'text/html');
@@ -102,7 +105,9 @@ async function handlePost(req, res) {
       const category = CATEGORIES.includes(body.category) ? body.category : 'landscape';
       const region = REGIONS.includes(body.region) ? (body.region || null) : null;
       const style = STYLES.some(s => s[0] === body.style) ? (body.style || null) : null;
-      const price = /^\$\d+$/.test(String(body.price)) ? String(body.price) : '$5';
+      // any whole-dollar price from $1 up; $0 and junk fall back to the cheapest
+      const pm = /^\$(\d{1,3})$/.exec(String(body.price || ''));
+      const price = (pm && Number(pm[1]) >= 1) ? '$' + Number(pm[1]) : PRICES[0];
       const tags = String(body.tags || '').trim().slice(0, 400) || null;
       const phash = /^[01]{64}$/.test(String(body.phash || '')) ? String(body.phash) : null;
 
@@ -124,7 +129,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v6';
+const PAGE_VERSION = 'v7';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -218,6 +223,7 @@ ${setupNote}
 
 <script>
 var PW = ${JSON.stringify(pw)};
+var PRICES = ${JSON.stringify(PRICES)};
 var MAX = 1400;              // display copies are capped at 1400px, same as the rest of the site
 var MIN_DPI = 170;           // matches the gallery: no soft or stretched prints
 var A3 = [11.69, 16.54];
@@ -342,7 +348,9 @@ function render(){
       '</div>' +
       '<div class="row">' +
         '<div><label>Style</label><select data-k="style">${stys}</select></div>' +
-        '<div><label>Price</label><select data-k="price"><option>$5</option><option>$10</option></select></div>' +
+        '<div><label>Price</label><select data-k="price">' +
+          PRICES.map(function(p){ return '<option>' + p + '</option>'; }).join('') +
+        '</select></div>' +
       '</div>' +
       '<label>Search words (optional)</label><input type="text" data-k="tags" value="' + s.tags.replace(/"/g, '&quot;') + '">' +
       '<div class="meta">' + s.width + ' × ' + s.height + ' px · ' + s.fileName + '</div>';
