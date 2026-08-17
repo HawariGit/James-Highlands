@@ -1775,10 +1775,9 @@
   }
   buildCountries();
 
-  // A category button with nothing behind it would just say "no results", so
-  // only show the ones that have work in them. A new category therefore appears
-  // on its own as soon as something is filed under it — the same rule the
-  // Countries dropdown already follows.
+  // Every category stays in the bar whether or not it has work in it yet, so a
+  // newly added one is visible straight away. An empty one simply says so when
+  // tapped, rather than being hidden until something is filed under it.
   function syncCategoryButtons(){
     const counts = {};
     document.querySelectorAll('.g-item').forEach(i=>{
@@ -1786,13 +1785,7 @@
       if (c) counts[c] = (counts[c] || 0) + 1;
     });
     document.querySelectorAll('.filter-btn[data-type="category"]').forEach(btn=>{
-      const has = (counts[btn.dataset.filter] || 0) > 0;
-      btn.style.display = has ? '' : 'none';
-      if (!has && btn.classList.contains('active')){   // don't leave a hidden filter selected
-        btn.classList.remove('active');
-        const all = document.querySelector('.filter-btn[data-type="all"]');
-        if (all) all.classList.add('active');
-      }
+      btn.dataset.count = counts[btn.dataset.filter] || 0;
     });
   }
   syncCategoryButtons();
@@ -1841,6 +1834,13 @@
       if(match) visible++;
     });
     noResults.style.display = visible === 0 ? 'block' : 'none';
+    if (visible === 0){
+      // an empty category is a different thing from a search that found nothing
+      const emptyCategory = type === 'category' && Number(active.dataset.count || 0) === 0 && query === '';
+      noResults.textContent = emptyCategory
+        ? 'No paintings in ' + active.textContent + ' yet.'
+        : 'No paintings match your search.';
+    }
   }
 
   // re-callable: buildCountries() replaces the dropdown buttons, so any new ones
