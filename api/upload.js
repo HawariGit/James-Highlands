@@ -1,5 +1,6 @@
 import postgres from 'postgres';
 import crypto from 'node:crypto';
+import Anthropic from '@anthropic-ai/sdk';
 import { put, del } from '@vercel/blob';
 import { ensureWorksTable } from './works.js';
 
@@ -103,9 +104,99 @@ export default async function handler(req, res) {
   return res.setHeader('content-type', 'text/html').status(200).send(page(String(req.query.pw)));
 }
 
+// Looks at the painting and proposes titles for it. Every failure path returns
+// ok:false rather than throwing, because the page already has pool-based names
+// on screen and simply keeps them.
+async function handleSuggest(body, res) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(200).json({ ok: false, error: 'Title suggestions are not configured.' });
+  }
+  const im = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(body.image || ''));
+  if (!im) return res.status(400).json({ ok: false, error: 'Bad image for suggestions.' });
+  const media = 'image/' + im[1];
+  const data = im[2];
+  if (data.length > 900000) {
+    return res.status(413).json({ ok: false, error: 'Preview image too large.' });
+  }
+
+  const cat = CATEGORIES.includes(body.category) ? body.category : 'landscape';
+  const taken = Array.isArray(body.taken)
+    ? body.taken.filter(t => typeof t === 'string').slice(0, 400) : [];
+
+  try {
+    const anthropic = new Anthropic();
+    const msg = await anthropic.messages.create({
+      model: 'claude-opus-5',
+      max_tokens: 4000,
+      output_config: {
+        effort: 'low',
+        format: {
+          type: 'json_schema',
+          schema: {
+            type: 'object',
+            properties: {
+              titles: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Exactly three distinct titles for this painting.',
+              },
+            },
+            required: ['titles'],
+            additionalProperties: false,
+          },
+        },
+      },
+      system:
+        'You title paintings for a watercolour gallery. Look at the painting and give three ' +
+        'titles that describe what is actually in it.\n\n' +
+        'House style, taken from the existing collection: "Shade of the Old Tree", ' +
+        '"Mist Over the Wadi", "Still Water, Distant Peaks", "The Old Stone Bridge", ' +
+        '"Watchtowers Above the Wadi", "Village on the Green Water", "Poppy Field", ' +
+        '"Long Reflection", "Blossom Lane".\n\n' +
+        'Rules: Title Case. Two to five words. Name what is in the picture: the subject, ' +
+        'the light, the weather. No invented place names, no personal names, no dates, ' +
+        'no numbering, no punctuation beyond a comma. Do not describe the medium. ' +
+        'Make the three genuinely different from each other rather than rewordings.',
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: media, data } },
+          { type: 'text', text:
+            'Title this painting. It is filed under the category "' + cat + '".' +
+            (taken.length
+              ? '\n\nThese titles are already used in the gallery, so do not repeat any of them:\n' +
+                taken.join('\n')
+              : ''),
+          },
+        ],
+      }],
+    });
+
+    if (msg.stop_reason === 'refusal') {
+      return res.status(200).json({ ok: false, error: 'Could not title this image.' });
+    }
+    const block = msg.content.find(b => b.type === 'text');
+    let titles = [];
+    try { titles = JSON.parse((block && block.text) || '{}').titles || []; } catch (e) { titles = []; }
+    titles = titles
+      .filter(t => typeof t === 'string')
+      .map(t => t.trim().replace(/["“”]/g, '').slice(0, 120))
+      .filter(Boolean)
+      .slice(0, 3);
+    if (!titles.length) return res.status(200).json({ ok: false, error: 'No titles came back.' });
+    return res.status(200).json({ ok: true, titles });
+  } catch (e) {
+    return res.status(200).json({ ok: false, error: String((e && e.message) || e) });
+  }
+}
+
 async function handlePost(req, res) {
   const body = req.body || {};
   try {
+    // Titling needs no database — answer before opening a connection, so a
+    // photo doesn't wait on the database just to be given a name.
+    if (body.action === 'suggest') return await handleSuggest(body, res);
+
     const sql = getSql();
     await ensureWorksTable(sql);
 
@@ -178,7 +269,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v8';
+const PAGE_VERSION = 'v9';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -245,6 +336,7 @@ function page(pw) {
   .sugg button:hover{border-color:var(--accent);color:var(--accent);}
   .sugg button.more{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;
     letter-spacing:.08em;text-transform:uppercase;color:var(--dim);background:none;}
+  .sugg .titling{align-self:center;font-size:11px;color:var(--dim);font-style:italic;}
   .live .d{font-size:11px;color:var(--dim);margin-top:2px;}
   .pending{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);
     color:#fff;padding:2px 6px;margin-left:6px;}
@@ -377,6 +469,28 @@ function pick(arr, taken, count){
   return out;
 }
 
+// Asks the server to look at the painting and title it. The pool-based names
+// are already on screen, so a failure here just leaves those in place.
+function askForTitles(s){
+  s.titling = true;
+  render();
+  post({
+    action: 'suggest',
+    image: s.thumb,
+    category: s.category,
+    taken: existingHashes.map(function(e){ return e.title; })
+      .concat(staged.map(function(x){ return x.title; }))
+      .filter(Boolean)
+  }).then(function(r){
+    s.titling = false;
+    if (r && r.ok && r.titles && r.titles.length){
+      s.suggestions = r.titles;
+      s.titledFromImage = true;
+    }
+    render();
+  }).catch(function(){ s.titling = false; render(); });
+}
+
 // Three names from the category, with one swapped for a mood name only when the
 // picture actually has a strong one. A washed-out photo of a car does not want
 // to be called "High Summer".
@@ -433,6 +547,17 @@ function makeDisplay(img){
   // last resort for very large images: re-encode smaller rather than fail
   if (url.length > 3500000) url = c.toDataURL('image/jpeg', 0.7);
   return url;
+}
+
+// small copy sent for titling — big enough to read the picture, small enough
+// to keep the request quick
+function makeThumb(img){
+  var w = img.naturalWidth, h = img.naturalHeight;
+  var scale = Math.min(1, 512 / Math.max(w, h));
+  var c = document.createElement('canvas');
+  c.width = Math.round(w * scale); c.height = Math.round(h * scale);
+  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.8);
 }
 
 // magnified bottom-right corner, where AI watermarks sit
@@ -506,13 +631,15 @@ function render(){
       });
       sg.appendChild(b);
     });
-    var more = el('button', 'more', '↻ other names');
+    var more = el('button', 'more', s.titledFromImage ? '↻ look again' : '↻ other names');
     more.type = 'button';
     more.addEventListener('click', function(){
       staged[idx].suggestions = suggestNames(staged[idx]);
       render();
+      askForTitles(staged[idx]);
     });
     sg.appendChild(more);
+    if (s.titling) sg.appendChild(el('span', 'titling', 'reading the painting…'));
 
     if(s.dupeOf){
       var d = el('div', 'dupe');
@@ -566,10 +693,12 @@ document.getElementById('files').addEventListener('change', function(ev){
           corner: cornerCrop(r.img),
           phash: hash,
           traits: traitsOf(r.img),
+          thumb: makeThumb(r.img),
           dupeOf: dupe
         });
         var last = staged[staged.length - 1];
-        last.suggestions = suggestNames(last);
+        last.suggestions = suggestNames(last);   // shown immediately
+        askForTitles(last);                      // replaced when the real ones arrive
         URL.revokeObjectURL(r.url);
         render();
       });
