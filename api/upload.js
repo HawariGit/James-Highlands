@@ -31,7 +31,7 @@ const slug = (s) => String(s || 'work').toLowerCase()
 
 const CATEGORIES = ['mountains', 'villages', 'wadis', 'botanical', 'countryside',
   'coast', 'rivers', 'wildlife', 'cars', 'landscape', 'interior',
-  'abstraction', 'nightlife'];
+  'abstraction', 'nightlife', 'seafront'];
 // "china" is deliberately absent: the ink-wash works are a style, not a place,
 // and no painting on the site depicts China. Add it back if that changes.
 const REGIONS = ['', 'oman', 'scotland', 'france', 'italy', 'uk', 'usa', 'uae'];
@@ -77,6 +77,9 @@ const NAME_POOLS = {
   nightlife: ['Neon on Wet Streets', 'After Midnight', 'The Late Window', 'Lights and Rain',
     'Closing Time', 'Signs in the Dark', 'Streetlight and Shadow', 'The Long Night',
     'Last Orders', 'City After Rain'],
+  seafront: ['The Long Promenade', 'Harbour Wall', 'Boats at the Quay', 'Along the Front',
+    'Where the Town Meets the Sea', 'Morning on the Harbour', 'The Sea Wall',
+    'Moored for the Evening', 'Terraces Above the Bay', 'The Waterfront'],
 };
 
 const TONE_POOLS = {
@@ -269,7 +272,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v9';
+const PAGE_VERSION = 'v10';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
