@@ -49,7 +49,9 @@
     z-index:999;
     pointer-events:none;
     opacity:var(--grain-opacity);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    /* spaces are percent-encoded: raw spaces in a data: URI are invalid and
+       stricter in-app browsers reject the whole URL */
+    background-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='120'%20height='120'%3E%3Cfilter%20id='n'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.9'%20numOctaves='2'%20stitchTiles='stitch'/%3E%3C/filter%3E%3Crect%20width='100%25'%20height='100%25'%20filter='url(%23n)'/%3E%3C/svg%3E");
     mix-blend-mode:overlay;
   }
 
@@ -352,11 +354,22 @@
     position:absolute;inset:0;
     z-index:2;
     pointer-events:none;
-    /* white fill + dark halo so it reads on light and dark areas alike.
-       deliberately no mix-blend-mode: it is unreliable inside transformed /
-       overflow-hidden containers on mobile Safari, where it vanished. */
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='140'%3E%3Cdefs%3E%3Cfilter id='sh'%3E%3CfeDropShadow dx='0' dy='0' stdDeviation='1.4' flood-color='%23000000' flood-opacity='0.4'/%3E%3C/filter%3E%3Cpattern id='wm' width='280' height='140' patternUnits='userSpaceOnUse' patternTransform='rotate(-25)'%3E%3Cg filter='url(%23sh)'%3E%3Ctext x='0' y='38' font-family='Helvetica, Arial, sans-serif' font-size='16' letter-spacing='1.5' fill='%23ffffff' fill-opacity='0.45'%3EJAMES HIGHLANDS ART%3C/text%3E%3Ctext x='140' y='105' font-family='Helvetica, Arial, sans-serif' font-size='16' letter-spacing='1.5' fill='%23ffffff' fill-opacity='0.45'%3EJAMES HIGHLANDS ART%3C/text%3E%3C/g%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wm)'/%3E%3C/svg%3E");
+    /* White fill + dark halo so it reads on light and dark areas alike.
+       Deliberately no mix-blend-mode: it is unreliable inside transformed /
+       overflow-hidden containers on mobile Safari, where it vanished.
+
+       A real PNG rather than an inline SVG. The SVG lived in a data: URI
+       containing raw spaces, which is invalid and which stricter in-app
+       browsers (Pinterest's, for one) can reject outright — the background
+       then fails silently and the painting shows unmarked. A plain image file
+       also avoids the restrictions browsers place on SVG used as a background,
+       where fonts and filters are not guaranteed to render.
+
+       Drawn at 2x and shown at 196x98. Tuned to the same ink density as the
+       SVG it replaces. Regenerate with scripts/make-watermark.py. */
+    background-image:url('images/watermark.png');
     background-repeat:repeat;
+    background-size:196px 98px;
   }
   .g-meta{
     display:flex;justify-content:space-between;align-items:baseline;
