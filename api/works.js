@@ -30,6 +30,9 @@ export async function ensureWorksTable(sql) {
   // painting style, kept separate from region: a Chinese ink work is not a
   // painting of China
   await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS style TEXT`;
+  // true once the wordmark is burned into the stored picture. Works uploaded
+  // before that change stay false and get the old CSS overlay instead.
+  await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS watermarked BOOLEAN NOT NULL DEFAULT false`;
   await sql`ALTER TABLE works ENABLE ROW LEVEL SECURITY`;
 }
 
@@ -37,7 +40,7 @@ export default async function handler(req, res) {
   try {
     const sql = getSql();
     await ensureWorksTable(sql);
-    const rows = await sql`SELECT id, title, category, region, style, tags, price, width, height, img_url
+    const rows = await sql`SELECT id, title, category, region, style, tags, price, width, height, img_url, watermarked
       FROM works WHERE hidden = false ORDER BY created_at DESC`;
     // short cache: new uploads should show up quickly, but not every visitor
     // needs to hit the database

@@ -258,8 +258,8 @@ async function handlePost(req, res) {
       const blob = await put(name, buf, { access: 'public', contentType: 'image/' + fmt });
 
       const [row] = await sql`INSERT INTO works
-        (title, category, region, style, tags, price, width, height, img_url, phash)
-        VALUES (${title}, ${category}, ${region}, ${style}, ${tags}, ${price}, ${width}, ${height}, ${blob.url}, ${phash})
+        (title, category, region, style, tags, price, width, height, img_url, phash, watermarked)
+        VALUES (${title}, ${category}, ${region}, ${style}, ${tags}, ${price}, ${width}, ${height}, ${blob.url}, ${phash}, true)
         RETURNING id`;
       return res.status(200).json({ ok: true, id: row.id, url: blob.url });
     }
@@ -272,7 +272,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v10';
+const PAGE_VERSION = 'v11';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -536,19 +536,62 @@ function readFile(file){
   });
 }
 
+// Burns the diagonal wordmark into the display copy. The website used to draw
+// this on top in CSS, which meant anyone who saved or pinned the picture got a
+// clean one. Now it is part of the pixels. The full-resolution original the
+// buyer receives is never touched.
+function stampWatermark(ctx, W, H){
+  var text = 'JAMES HIGHLANDS ART';
+  var font = Math.max(9, Math.round(W * 0.024));
+  var track = font * (1.5 / 16);
+  ctx.save();
+  ctx.font = font + 'px Helvetica, Arial, sans-serif';
+  ctx.textBaseline = 'top';
+  var i, tw = 0;
+  for (i = 0; i < text.length; i++) tw += ctx.measureText(text[i]).width + track;
+  var stepX = Math.round(tw * 1.45);
+  var stepY = Math.round(font * 3.4);
+  var side = Math.round(Math.sqrt(W * W + H * H) * 1.25);
+  // lay the rows out flat, then rotate the whole canvas, so rows stay evenly
+  // spaced instead of colliding
+  ctx.translate(W / 2, H / 2);
+  ctx.rotate(-25 * Math.PI / 180);
+  ctx.translate(-side / 2, -side / 2);
+  ctx.shadowColor = 'rgba(0,0,0,0.44)';
+  ctx.shadowBlur = Math.max(1, font * (1.4 / 16)) * 2;
+  ctx.fillStyle = 'rgba(255,255,255,0.53)';
+  var row = 0;
+  for (var y = 0; y < side; y += stepY) {
+    for (var x = -stepX + (row % 2) * (stepX / 2); x < side; x += stepX) {
+      var cx = x;
+      for (i = 0; i < text.length; i++) {
+        ctx.fillText(text[i], cx, y);
+        cx += ctx.measureText(text[i]).width + track;
+      }
+    }
+    row++;
+  }
+  ctx.restore();
+}
+
 function makeDisplay(img){
   var w = img.naturalWidth, h = img.naturalHeight;
   var scale = Math.min(1, MAX / Math.max(w, h));
   var c = document.createElement('canvas');
   c.width = Math.round(w * scale); c.height = Math.round(h * scale);
-  c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  var ctx = c.getContext('2d');
+  ctx.drawImage(img, 0, 0, c.width, c.height);
+  stampWatermark(ctx, c.width, c.height);
   // Safari and older browsers ignore image/webp here and quietly hand back a
   // PNG, which the server rejects and which is big enough to blow the request
   // size limit — so check what we actually got and fall back to JPEG.
-  var url = c.toDataURL('image/webp', 0.85);
-  if (url.indexOf('data:image/webp') !== 0) url = c.toDataURL('image/jpeg', 0.85);
+  // Quality 0.72 rather than 0.85: the uploads were landing at ~360KB each,
+  // several times the weight of the rest of the gallery, which made a page of
+  // them crawl.
+  var url = c.toDataURL('image/webp', 0.72);
+  if (url.indexOf('data:image/webp') !== 0) url = c.toDataURL('image/jpeg', 0.72);
   // last resort for very large images: re-encode smaller rather than fail
-  if (url.length > 3500000) url = c.toDataURL('image/jpeg', 0.7);
+  if (url.length > 3500000) url = c.toDataURL('image/jpeg', 0.6);
   return url;
 }
 
