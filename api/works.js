@@ -33,6 +33,11 @@ export async function ensureWorksTable(sql) {
   // true once the wordmark is burned into the stored picture. Works uploaded
   // before that change stay false and get the old CSS overlay instead.
   await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS watermarked BOOLEAN NOT NULL DEFAULT false`;
+  // The full-resolution file a buyer receives. It goes straight from the browser
+  // to Blob storage, so it is not bound by the 4.5MB request limit that forced
+  // every earlier upload down to a 1400px web copy. Deliberately not returned by
+  // the public handler below: these files are clean, unwatermarked art.
+  await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS original_url TEXT`;
   await sql`ALTER TABLE works ENABLE ROW LEVEL SECURITY`;
 }
 

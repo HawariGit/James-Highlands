@@ -1,7 +1,8 @@
 import postgres from 'postgres';
 import crypto from 'node:crypto';
 import Anthropic from '@anthropic-ai/sdk';
-import { put, del } from '@vercel/blob';
+import { put, del, head } from '@vercel/blob';
+import { handleUpload } from '@vercel/blob/client';
 import { ensureWorksTable } from './works.js';
 
 let _sql;
@@ -39,6 +40,15 @@ const STYLES = [['', '— none —'], ['chinese-ink', 'Chinese Ink']];
 // suggestPrice() still proposes $5 or $10 from the file's resolution; these are
 // what it can be overridden to by hand
 const PRICES = ['$1', '$2', '$3', '$5', '$10'];
+
+// What a phone or camera might label the full-size original. Some Android
+// browsers hand over an empty type for HEIC, which arrives as octet-stream;
+// that is allowed here because reaching this point already needs the password.
+const ORIGINAL_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/tiff',
+  'image/heic', 'image/heif', 'application/octet-stream'];
+
+// A URL is only believed to be one of our originals if it looks like this.
+const ORIGINAL_URL = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/originals\//i;
 
 // Title suggestions. The page picks from the pool for the chosen category and
 // mixes in one drawn from the picture's own colour and brightness, so the
@@ -98,7 +108,10 @@ function deny(res) {
 }
 
 export default async function handler(req, res) {
-  const pw = req.method === 'POST' ? (req.body && req.body.pw) : req.query.pw;
+  // The direct-to-storage upload posts a body shaped by the Blob SDK, which has
+  // nowhere to put our password, so those requests carry it in the query string
+  // instead — the same way this page is opened in the first place.
+  const pw = (req.method === 'POST' ? (req.body && req.body.pw) : null) || req.query.pw;
   if (!pwOk(pw)) return deny(res);
 
   if (req.method === 'POST') return handlePost(req, res);
@@ -200,12 +213,34 @@ async function handlePost(req, res) {
     // photo doesn't wait on the database just to be given a name.
     if (body.action === 'suggest') return await handleSuggest(body, res);
 
+    // The full-size original never passes through this function. Vercel caps a
+    // request body at 4.5MB and these files run to 40MB and beyond — that cap is
+    // the whole reason earlier uploads were only ever a 1400px web copy. The
+    // page now sends the original straight to Blob storage, and this branch just
+    // hands out a short-lived token good for writing one file.
+    if (body.type === 'blob.generate-client-token' || body.type === 'blob.upload-completed') {
+      const json = await handleUpload({
+        body,
+        request: req,
+        onBeforeGenerateToken: async () => ({
+          allowedContentTypes: ORIGINAL_TYPES,
+          maximumSizeInBytes: 200 * 1024 * 1024,
+          addRandomSuffix: true,
+        }),
+        // Nothing to do on completion: the page reports the finished URL with
+        // the save below, and that URL is checked against storage before it
+        // reaches the row — so a work can never claim an original it lacks.
+        onUploadCompleted: async () => {},
+      });
+      return res.status(200).json(json);
+    }
+
     const sql = getSql();
     await ensureWorksTable(sql);
 
     if (body.action === 'list') {
       const rows = await sql`SELECT id, title, category, region, style, price, width, height, img_url,
-        phash, original_pending, watermarked, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
+        phash, original_pending, original_url, watermarked, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
       return res.status(200).json({ ok: true, works: rows });
     }
 
@@ -235,6 +270,32 @@ async function handlePost(req, res) {
       return res.status(200).json({ ok: true });
     }
 
+    // Adds the full-size original to a painting that went up without one: every
+    // upload made before this page could send big files, and any where the
+    // connection dropped part way. The file reaches storage the same way as a
+    // new upload; this only checks it arrived and records it against the row.
+    if (body.action === 'attach-original') {
+      const id = parseInt(body.id, 10);
+      if (!id) return res.status(400).json({ ok: false, error: 'No id given.' });
+      const cand = String(body.originalUrl || '');
+      if (!ORIGINAL_URL.test(cand)) {
+        return res.status(400).json({ ok: false, error: 'That is not a stored original.' });
+      }
+      let size = 0;
+      try { const meta = await head(cand); size = (meta && meta.size) || 0; }
+      catch (e) { return res.status(400).json({ ok: false, error: 'The file did not reach storage.' }); }
+      if (!size) return res.status(400).json({ ok: false, error: 'The stored file is empty.' });
+
+      const [row] = await sql`SELECT original_url FROM works WHERE id = ${id}`;
+      if (!row) return res.status(404).json({ ok: false, error: 'No such painting.' });
+      await sql`UPDATE works SET original_url = ${cand}, original_pending = false WHERE id = ${id}`;
+      // only drop a previous original once the row points at the new one
+      if (row.original_url && row.original_url !== cand) {
+        try { await del(row.original_url); } catch (e) { /* already gone */ }
+      }
+      return res.status(200).json({ ok: true });
+    }
+
     if (body.action === 'rename') {
       const id = parseInt(body.id, 10);
       const title = String(body.title || '').trim().slice(0, 120);
@@ -247,8 +308,9 @@ async function handlePost(req, res) {
     if (body.action === 'delete') {
       const id = parseInt(body.id, 10);
       if (!id) return res.status(400).json({ ok: false, error: 'No id given.' });
-      const [row] = await sql`SELECT img_url FROM works WHERE id = ${id}`;
+      const [row] = await sql`SELECT img_url, original_url FROM works WHERE id = ${id}`;
       if (row && row.img_url) { try { await del(row.img_url); } catch (e) { /* blob already gone */ } }
+      if (row && row.original_url) { try { await del(row.original_url); } catch (e) { /* already gone */ } }
       await sql`DELETE FROM works WHERE id = ${id}`;
       return res.status(200).json({ ok: true });
     }
@@ -280,14 +342,29 @@ async function handlePost(req, res) {
       const tags = String(body.tags || '').trim().slice(0, 400) || null;
       const phash = /^[01]{64}$/.test(String(body.phash || '')) ? String(body.phash) : null;
 
+      // The page uploads the untouched original straight to storage and hands
+      // back the URL. Trust it only if the file is really there: an upload cut
+      // off half way must leave the work flagged as still needing its original,
+      // never quietly recorded as having one.
+      let originalUrl = null;
+      const cand = String(body.originalUrl || '');
+      if (ORIGINAL_URL.test(cand)) {
+        try {
+          const meta = await head(cand);
+          if (meta && meta.size > 0) originalUrl = cand;
+        } catch (e) { /* not in storage — the row stays pending */ }
+      }
+
       const name = 'uploads/' + slug(title) + '-' + Date.now().toString(36) + (fmt === 'webp' ? '.webp' : '.jpg');
       const blob = await put(name, buf, { access: 'public', contentType: 'image/' + fmt });
 
       const [row] = await sql`INSERT INTO works
-        (title, category, region, style, tags, price, width, height, img_url, phash, watermarked)
-        VALUES (${title}, ${category}, ${region}, ${style}, ${tags}, ${price}, ${width}, ${height}, ${blob.url}, ${phash}, true)
+        (title, category, region, style, tags, price, width, height, img_url, phash, watermarked,
+         original_url, original_pending)
+        VALUES (${title}, ${category}, ${region}, ${style}, ${tags}, ${price}, ${width}, ${height}, ${blob.url}, ${phash}, true,
+         ${originalUrl}, ${!originalUrl})
         RETURNING id`;
-      return res.status(200).json({ ok: true, id: row.id, url: blob.url });
+      return res.status(200).json({ ok: true, id: row.id, url: blob.url, original: !!originalUrl });
     }
 
     return res.status(400).json({ ok: false, error: 'Unknown action.' });
@@ -298,7 +375,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v12';
+const PAGE_VERSION = 'v13';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -371,6 +448,7 @@ function page(pw) {
   .remark .btn{margin-top:10px;}
   .remark .prog{margin-top:8px;font-size:12px;color:var(--dim);}
   .live .d{font-size:11px;color:var(--dim);margin-top:2px;}
+  .live .btn{flex-shrink:0;}
   .pending{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);
     color:#fff;padding:2px 6px;margin-left:6px;}
   @media(max-width:560px){ .card{grid-template-columns:1fr;} .thumbs{flex-direction:row;} .thumb,.corner{width:50%;height:96px;} }
@@ -413,6 +491,16 @@ var MIN_DPI = 170;           // matches the gallery: no soft or stretched prints
 var A3 = [11.69, 16.54];
 var staged = [];
 var existingHashes = [];
+
+// The Blob SDK's browser build, bundled once into /blob-client.js. This is what
+// lets a 40MB photo reach storage at all: it splits the file into parts, sends
+// them in parallel and retries the ones that fail, which is what a phone on
+// mobile data needs. If it will not load, publishing still works — the painting
+// goes up without its original and is marked as needing one.
+var blobUpload = null;
+import('/blob-client.js')
+  .then(function(m){ blobUpload = m.upload; })
+  .catch(function(){ blobUpload = null; });
 
 function el(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
 // the status line lives in a bar that is hidden while nothing is staged, so
@@ -627,6 +715,29 @@ function makeDisplay(img){
   return url;
 }
 
+function slugify(s){
+  return String(s || 'painting').toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '').slice(0, 60) || 'painting';
+}
+
+// Sends the photo exactly as it came off the camera: full size, no watermark,
+// nothing re-encoded, straight to storage without passing through this site —
+// which is the only way past the 4.5MB limit on anything sent to /api/upload.
+// Resolves to the stored URL, or to null if it could not be sent, in which case
+// the painting is still published and shows as needing its original.
+function sendOriginal(s, onPct){
+  if (!blobUpload || !s.file) return Promise.resolve(null);
+  var ext = (/\.([A-Za-z0-9]{1,5})$/.exec(s.fileName || '') || [null, 'jpg'])[1].toLowerCase();
+  var name = 'originals/' + slugify(s.title) + '-' + Date.now().toString(36) + '.' + ext;
+  return blobUpload(name, s.file, {
+    access: 'public',
+    handleUploadUrl: location.pathname + '?pw=' + encodeURIComponent(PW),
+    // splitting is only worth its extra requests on a file big enough to matter
+    multipart: s.file.size > 8 * 1024 * 1024,
+    onUploadProgress: function(p){ if (onPct) onPct(Math.round(p.percentage)); }
+  }).then(function(b){ return b.url; }).catch(function(){ return null; });
+}
+
 // small copy sent for titling — big enough to read the picture, small enough
 // to keep the request quick
 function makeThumb(img){
@@ -758,6 +869,7 @@ document.getElementById('files').addEventListener('change', function(ev){
         existingHashes.concat(staged.map(function(s){ return {phash: s.phash, title: s.title}; }))
           .forEach(function(e){ if(!dupe && hamming(e.phash, hash) <= 5) dupe = e.title; });
         staged.push({
+          file: file,              // kept whole, so the original can be sent as-is
           fileName: file.name,
           title: titleFromName(file.name),
           category: 'landscape',
@@ -799,25 +911,39 @@ document.getElementById('publish').addEventListener('click', function(){
     return;
   }
   btn.disabled = true;
-  var done = 0, failed = [];
+  var done = 0, failed = [], noOriginal = [];
   staged.slice().reduce(function(chain, s){
     return chain.then(function(){
-      status.textContent = 'Uploading ' + (done + 1) + ' of ' + staged.length + '…';
-      return post({
-        action: 'save', title: s.title, category: s.category, region: s.region, style: s.style,
-        price: s.price, tags: s.tags, width: s.width, height: s.height,
-        image: s.display, phash: s.phash
+      var n = done + noOriginal.length + failed.length + 1;
+      // the big file first: if it cannot be sent there is no point pretending
+      // afterwards that the painting is ready to sell
+      status.textContent = 'Sending the full-size ' + s.title + ' — 0%';
+      return sendOriginal(s, function(pct){
+        status.textContent = 'Sending the full-size ' + s.title + ' — ' + pct + '%';
+      }).then(function(originalUrl){
+        status.textContent = 'Publishing ' + n + ' of ' + staged.length + '…';
+        return post({
+          action: 'save', title: s.title, category: s.category, region: s.region, style: s.style,
+          price: s.price, tags: s.tags, width: s.width, height: s.height,
+          image: s.display, phash: s.phash, originalUrl: originalUrl
+        });
       }).then(function(r){
-        if(r.ok){ done++; } else { failed.push(s.title + ': ' + r.error); }
+        if(!r.ok){ failed.push(s.title + ': ' + r.error); }
+        else if(r.original){ done++; }
+        else { noOriginal.push(s.title); }
       }).catch(function(e){ failed.push(s.title + ': ' + e.message); });
     });
   }, Promise.resolve()).then(function(){
     staged = [];
     render();
     btn.disabled = false;
-    status.textContent = failed.length
-      ? ('Published ' + done + '. Failed: ' + failed.join(' | '))
-      : ('Published ' + done + '. They are live on the site now.');
+    var parts = [];
+    if (done) parts.push('Published ' + done + ' with the full-size file saved.');
+    if (noOriginal.length) parts.push('Published ' + noOriginal.length +
+      ' without the full-size file: ' + noOriginal.join(', ') +
+      '. They show "original needed" below — tap Add original to send it.');
+    if (failed.length) parts.push('Failed: ' + failed.join(' | '));
+    status.textContent = parts.join(' ') || 'Nothing was published.';
     loadLive();
   });
 });
@@ -930,6 +1056,37 @@ function loadLive(){
         ' · ' + w.price + ' · ' + w.width + '×' + w.height);
       if(w.original_pending){ d.appendChild(el('span', 'pending', 'original needed')); }
       g.appendChild(d); row.appendChild(g);
+
+      // Every painting uploaded before this page could send big files went up as
+      // a 1400px web copy only, so it cannot be fulfilled if it sells. This adds
+      // the real file to one of them without deleting and re-uploading the work.
+      if(w.original_pending){
+        var of = document.createElement('input');
+        of.type = 'file'; of.accept = 'image/*'; of.style.display = 'none';
+        var ob = el('button', 'btn ghost', 'Add original');
+        ob.addEventListener('click', function(){ of.click(); });
+        of.addEventListener('change', function(){
+          var file = of.files && of.files[0];
+          if(!file) return;
+          if(!blobUpload){ alert('The uploader did not load. Reload the page and try again.'); return; }
+          ob.disabled = true; ob.textContent = '0%';
+          sendOriginal({file: file, fileName: file.name, title: w.title}, function(pct){
+            ob.textContent = pct + '%';
+          }).then(function(url){
+            if(!url){
+              ob.disabled = false; ob.textContent = 'Add original';
+              alert('That did not reach storage. Try again on a better connection.');
+              return;
+            }
+            return post({action:'attach-original', id: w.id, originalUrl: url}).then(function(res){
+              if(res.ok){ loadLive(); }
+              else { ob.disabled = false; ob.textContent = 'Add original'; alert(res.error); }
+            });
+          });
+        });
+        row.appendChild(of); row.appendChild(ob);
+      }
+
       var b = el('button', 'btn ghost', 'Delete');
       b.addEventListener('click', function(){
         if(!confirm('Remove "' + w.title + '" from the site?')) return;
