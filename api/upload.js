@@ -4,6 +4,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { put, del, head } from '@vercel/blob';
 import { handleUpload } from '@vercel/blob/client';
 import { ensureWorksTable } from './works.js';
+import { igToken } from './instagram.js';
 
 let _sql;
 function getSql() {
@@ -320,7 +321,9 @@ async function handlePost(req, res) {
     // has published it, it holds its own copy, so ours is deleted again and the
     // whole feature costs nothing in storage.
     if (body.action === 'instagram-post') {
-      const token = process.env.IG_ACCESS_TOKEN;
+      // the renewed token if the weekly job has ever replaced it, otherwise
+      // the one set by hand in the environment
+      const token = await igToken(sql);
       const igUser = process.env.IG_USER_ID;
       if (!token || !igUser) {
         return res.status(200).json({ ok: false,

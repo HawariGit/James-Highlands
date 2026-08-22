@@ -1,4 +1,5 @@
 import postgres from 'postgres';
+import { refreshIgToken } from './instagram.js';
 
 let _sql;
 function getSql() {
@@ -64,6 +65,19 @@ export default async function handler(req, res) {
       WHERE event = 'pageview' AND ts > now() - interval '7 days'
       GROUP BY country ORDER BY c DESC LIMIT 5`;
 
+    // Renew the Instagram token while we are here. A long-lived one lasts 60
+    // days, and posting would otherwise fail silently two months after it was
+    // set up with nothing to say why. Wrapped so that trouble with Instagram
+    // can never stop the visitor report going out.
+    let ig = null;
+    try { ig = await refreshIgToken(sql); }
+    catch (e) { ig = { state: 'failed', note: String((e && e.message) || e) }; }
+    const igBad = ig && (ig.state === 'failed' || ig.state === 'invalid' || ig.state === 'unreadable');
+    const igLine = (!ig || ig.state === 'not-configured') ? '' :
+      `<p style="margin-top:24px;font-size:12px;color:${igBad ? '#b4432f' : '#8a8272'}">
+        <b>Instagram token:</b> ${esc(ig.note || ig.state)}${igBad ? ' — posting will stop working until this is sorted.' : ''}
+      </p>`;
+
     const period = new Date().toISOString().slice(0, 10);
     const stat = (label, val) =>
       `<td style="padding:14px 18px;background:#F7E7C5;border:1px solid #eadfc0;text-align:center">
@@ -86,6 +100,7 @@ export default async function handler(req, res) {
       ${table('Traffic sources', sources, 'source', 'c')}
       ${table('Top searches', searches, 'query', 'c')}
       ${table('Top countries', countries, 'country', 'c')}
+      ${igLine}
       <p style="margin-top:32px;font-size:12px;color:#8a8272">
         Full dashboard: <a href="https://jhart.vercel.app/api/admin" style="color:#c98a4b">jhart.vercel.app/api/admin</a> (add your password)
       </p>
@@ -104,7 +119,7 @@ export default async function handler(req, res) {
     const result = await send.json();
     if (!send.ok) { res.status(502).json({ error: 'resend failed', detail: result }); return; }
 
-    res.status(200).json({ ok: true, sent_to: to, id: result.id });
+    res.status(200).json({ ok: true, sent_to: to, id: result.id, instagram: ig });
   } catch (e) {
     res.status(500).json({ error: String(e && e.message || e) });
   }
