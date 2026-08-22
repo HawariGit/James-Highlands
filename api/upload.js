@@ -205,8 +205,34 @@ async function handlePost(req, res) {
 
     if (body.action === 'list') {
       const rows = await sql`SELECT id, title, category, region, style, price, width, height, img_url,
-        phash, original_pending, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
+        phash, original_pending, watermarked, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
       return res.status(200).json({ ok: true, works: rows });
+    }
+
+    // Replaces one older upload's picture with a watermarked copy. The page
+    // does the stamping (same code that marks new uploads) and sends the result
+    // here; this only stores it and points the row at the new file.
+    if (body.action === 'remark') {
+      if (!process.env.BLOB_READ_WRITE_TOKEN) {
+        return res.status(500).json({ ok: false, error: 'Image storage is not set up.' });
+      }
+      const id = parseInt(body.id, 10);
+      if (!id) return res.status(400).json({ ok: false, error: 'No id given.' });
+      const m = /^data:image\/(webp|jpeg);base64,([A-Za-z0-9+/=]+)$/.exec(String(body.image || ''));
+      if (!m) return res.status(400).json({ ok: false, error: 'Image was not in a usable format.' });
+      const buf = Buffer.from(m[2], 'base64');
+      if (buf.length > 4_000_000) return res.status(413).json({ ok: false, error: 'Image too large.' });
+
+      const [row] = await sql`SELECT img_url, title FROM works WHERE id = ${id}`;
+      if (!row) return res.status(404).json({ ok: false, error: 'No such painting.' });
+
+      const name = 'uploads/' + slug(row.title) + '-' + Date.now().toString(36) +
+        (m[1] === 'webp' ? '.webp' : '.jpg');
+      const blob = await put(name, buf, { access: 'public', contentType: 'image/' + m[1] });
+      await sql`UPDATE works SET img_url = ${blob.url}, watermarked = true WHERE id = ${id}`;
+      // only drop the old file once the row points at the new one
+      if (row.img_url) { try { await del(row.img_url); } catch (e) { /* already gone */ } }
+      return res.status(200).json({ ok: true });
     }
 
     if (body.action === 'rename') {
@@ -272,7 +298,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v11';
+const PAGE_VERSION = 'v12';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -340,6 +366,10 @@ function page(pw) {
   .sugg button.more{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;
     letter-spacing:.08em;text-transform:uppercase;color:var(--dim);background:none;}
   .sugg .titling{align-self:center;font-size:11px;color:var(--dim);font-style:italic;}
+  .remark{background:#fff3cd;border:1px solid #e0c98a;padding:14px;margin:26px 0 0;font-size:13px;line-height:1.5;}
+  .remark b{display:block;margin-bottom:4px;}
+  .remark .btn{margin-top:10px;}
+  .remark .prog{margin-top:8px;font-size:12px;color:var(--dim);}
   .live .d{font-size:11px;color:var(--dim);margin-top:2px;}
   .pending{display:inline-block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;background:var(--accent);
     color:#fff;padding:2px 6px;margin-left:6px;}
@@ -366,6 +396,8 @@ ${setupNote}
   <button class="btn" id="publish">Publish</button>
   <span class="status" id="status"></span>
 </div>
+
+<div id="remarkPanel" style="display:none"></div>
 
 <h2>Already on the site</h2>
 <div class="sub">Uploaded through this page. Deleting removes it from the site immediately.</div>
@@ -790,12 +822,90 @@ document.getElementById('publish').addEventListener('click', function(){
   });
 });
 
+// Older uploads are clean files with the mark only drawn over them by the
+// website, so anyone who saves one gets unmarked art. This re-stamps them for
+// real: the page pulls each picture back, burns the mark in with the same code
+// that marks new uploads, and sends the result to replace the stored file.
+var REMARK = { list: [], running: false, done: 0, failed: 0 };
+
+function remarkOne(w){
+  return new Promise(function(resolve){
+    var im = new Image();
+    im.crossOrigin = 'anonymous';   // needed or the canvas is tainted and unreadable
+    im.onload = function(){
+      try {
+        var c = document.createElement('canvas');
+        c.width = im.naturalWidth; c.height = im.naturalHeight;
+        var ctx = c.getContext('2d');
+        ctx.drawImage(im, 0, 0);
+        stampWatermark(ctx, c.width, c.height);
+        var url = c.toDataURL('image/webp', 0.72);
+        if (url.indexOf('data:image/webp') !== 0) url = c.toDataURL('image/jpeg', 0.72);
+        post({ action: 'remark', id: w.id, image: url })
+          .then(function(r){ resolve(!!(r && r.ok)); })
+          .catch(function(){ resolve(false); });
+      } catch (e) { resolve(false); }
+    };
+    im.onerror = function(){ resolve(false); };
+    im.src = w.img_url;
+  });
+}
+
+function renderRemark(){
+  var box = document.getElementById('remarkPanel');
+  if (REMARK.running){
+    box.style.display = 'block';
+    box.innerHTML = '';
+    var p = el('div', 'remark');
+    p.appendChild(el('b', null, 'Adding the watermark to older paintings…'));
+    p.appendChild(el('div', 'prog',
+      'Done ' + REMARK.done + ' of ' + REMARK.list.length +
+      (REMARK.failed ? '  ·  ' + REMARK.failed + ' could not be done' : '') +
+      '. Leave this page open until it finishes.'));
+    box.appendChild(p);
+    return;
+  }
+  if (!REMARK.list.length){ box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = 'block';
+  box.innerHTML = '';
+  var p = el('div', 'remark');
+  p.appendChild(el('b', null, REMARK.list.length + ' older paintings have no watermark in the file'));
+  p.appendChild(document.createTextNode(
+    'They look marked on the site, but the mark is only drawn on top — save or pin one and it comes out clean. ' +
+    'This burns it into the picture itself. It replaces the stored file, so it cannot be undone. ' +
+    'The full-size originals are not touched.'));
+  var b = el('button', 'btn', 'Add the watermark to all ' + REMARK.list.length);
+  b.type = 'button';
+  b.addEventListener('click', function(){ runRemark(); });
+  p.appendChild(b);
+  box.appendChild(p);
+}
+
+function runRemark(){
+  if (REMARK.running || !REMARK.list.length) return;
+  REMARK.running = true; REMARK.done = 0; REMARK.failed = 0;
+  renderRemark();
+  REMARK.list.slice().reduce(function(chain, w){
+    return chain.then(function(){
+      return remarkOne(w).then(function(ok){
+        if (ok) REMARK.done++; else REMARK.failed++;
+        renderRemark();
+      });
+    });
+  }, Promise.resolve()).then(function(){
+    REMARK.running = false;
+    loadLive();          // refresh: anything done drops out of the list
+  });
+}
+
 function loadLive(){
   post({action: 'list'}).then(function(r){
     var box = document.getElementById('live');
     box.innerHTML = '';
     if(!r.ok){ box.appendChild(el('div', 'sub', r.error || 'Could not load.')); return; }
     existingHashes = r.works.map(function(w){ return {phash: w.phash, title: w.title}; });
+    REMARK.list = r.works.filter(function(w){ return !w.watermarked; });
+    renderRemark();
     if(!r.works.length){ box.appendChild(el('div', 'sub', 'Nothing uploaded through this page yet.')); return; }
     r.works.forEach(function(w){
       var row = el('div', 'live');
