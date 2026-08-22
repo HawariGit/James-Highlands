@@ -38,6 +38,9 @@ export async function ensureWorksTable(sql) {
   // every earlier upload down to a 1400px web copy. Deliberately not returned by
   // the public handler below: these files are clean, unwatermarked art.
   await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS original_url TEXT`;
+  // the Instagram media id, once a work has been posted. Kept so the upload page
+  // can show what is already up and not offer to post it twice.
+  await sql`ALTER TABLE works ADD COLUMN IF NOT EXISTS instagram_id TEXT`;
   await sql`ALTER TABLE works ENABLE ROW LEVEL SECURITY`;
 }
 

@@ -50,6 +50,24 @@ const ORIGINAL_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/tiff',
 // A URL is only believed to be one of our originals if it looks like this.
 const ORIGINAL_URL = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/originals\//i;
 
+// Instagram's feed only takes JPEG, between 4:5 and 1.91:1, up to 1440px wide.
+// The page renders a copy that fits and parks it here just long enough for Meta
+// to fetch it.
+const SOCIAL_URL = /^https:\/\/[a-z0-9]+\.public\.blob\.vercel-storage\.com\/social\//i;
+
+// v25.0 is supported until July 2028 and is untouched by the endpoint removals
+// that came with v26.0. Set IG_API_VERSION to move off it.
+const IG_VERSION = process.env.IG_API_VERSION || 'v25.0';
+
+// Meta's failures arrive nested and are often blunt. Surface the real reason
+// rather than a generic failure, because the usual causes — wrong aspect ratio,
+// expired token — are all things that can be acted on.
+function igError(j, fallback) {
+  const e = j && j.error;
+  const msg = e && (e.error_user_msg || e.message);
+  return msg ? (fallback + ': ' + msg) : fallback;
+}
+
 // Title suggestions. The page picks from the pool for the chosen category and
 // mixes in one drawn from the picture's own colour and brightness, so the
 // offered names suit what was actually uploaded. Written to sit alongside the
@@ -240,7 +258,7 @@ async function handlePost(req, res) {
 
     if (body.action === 'list') {
       const rows = await sql`SELECT id, title, category, region, style, price, width, height, img_url,
-        phash, original_pending, original_url, watermarked, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
+        phash, original_pending, original_url, watermarked, instagram_id, created_at FROM works WHERE hidden = false ORDER BY created_at DESC`;
       return res.status(200).json({ ok: true, works: rows });
     }
 
@@ -294,6 +312,61 @@ async function handlePost(req, res) {
         try { await del(row.original_url); } catch (e) { /* already gone */ }
       }
       return res.status(200).json({ ok: true });
+    }
+
+    // Posts one painting to Instagram. The file never passes through Meta's API:
+    // it is handed a public URL and fetches the picture itself, which is why the
+    // page renders an Instagram-shaped JPEG into storage first. Once Instagram
+    // has published it, it holds its own copy, so ours is deleted again and the
+    // whole feature costs nothing in storage.
+    if (body.action === 'instagram-post') {
+      const token = process.env.IG_ACCESS_TOKEN;
+      const igUser = process.env.IG_USER_ID;
+      if (!token || !igUser) {
+        return res.status(200).json({ ok: false,
+          error: 'Instagram is not connected yet — IG_ACCESS_TOKEN and IG_USER_ID need setting in Vercel.' });
+      }
+      const id = parseInt(body.id, 10);
+      if (!id) return res.status(400).json({ ok: false, error: 'No id given.' });
+      const img = String(body.imageUrl || '');
+      if (!SOCIAL_URL.test(img)) {
+        return res.status(400).json({ ok: false, error: 'That is not a stored Instagram copy.' });
+      }
+      const caption = String(body.caption || '').slice(0, 2200);
+
+      const [work] = await sql`SELECT instagram_id FROM works WHERE id = ${id}`;
+      if (!work) return res.status(404).json({ ok: false, error: 'No such painting.' });
+      if (work.instagram_id) {
+        return res.status(200).json({ ok: false, error: 'That painting is already on Instagram.' });
+      }
+
+      const base = 'https://graph.facebook.com/' + IG_VERSION + '/' + encodeURIComponent(igUser);
+      // step one: hand Meta the URL and let it pull the picture down
+      const mk = await fetch(base + '/media', {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ image_url: img, caption, access_token: token }),
+      });
+      const mkJson = await mk.json().catch(() => ({}));
+      if (!mk.ok || !mkJson.id) {
+        return res.status(200).json({ ok: false, error: igError(mkJson, 'Instagram would not accept the picture') });
+      }
+
+      // step two: publish the container it just built
+      const pub = await fetch(base + '/media_publish', {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ creation_id: String(mkJson.id), access_token: token }),
+      });
+      const pubJson = await pub.json().catch(() => ({}));
+      if (!pub.ok || !pubJson.id) {
+        return res.status(200).json({ ok: false, error: igError(pubJson, 'The picture was accepted but not published') });
+      }
+
+      await sql`UPDATE works SET instagram_id = ${String(pubJson.id)} WHERE id = ${id}`;
+      // Instagram serves its own copy from here on, so ours is only taking room
+      try { await del(img); } catch (e) { /* already gone */ }
+      return res.status(200).json({ ok: true, instagramId: String(pubJson.id) });
     }
 
     if (body.action === 'rename') {
@@ -375,7 +448,7 @@ async function handlePost(req, res) {
 
 // bumped by hand when this page changes, so it's possible to tell from the
 // page itself whether a browser is showing an old copy
-const PAGE_VERSION = 'v13';
+const PAGE_VERSION = 'v14';
 
 function page(pw) {
   const needsBlob = !process.env.BLOB_READ_WRITE_TOKEN;
@@ -383,6 +456,13 @@ function page(pw) {
     <b>Image storage isn't connected yet.</b> In the Vercel dashboard open this project →
     Storage → Create a Blob store and link it. That sets <code>BLOB_READ_WRITE_TOKEN</code>
     automatically. Uploads will fail until then.</div>` : '';
+
+  const igReady = !!(process.env.IG_ACCESS_TOKEN && process.env.IG_USER_ID);
+  const igNote = igReady ? '' : `<div class="warn setup">
+    <b>Instagram posting isn't connected yet.</b> The account has to be a Professional
+    account linked to a Facebook Page, and <code>IG_ACCESS_TOKEN</code> and
+    <code>IG_USER_ID</code> need setting in the Vercel project settings. Until then the
+    Post to Instagram buttons stay hidden.</div>`;
 
   const cats = CATEGORIES.map(c => '<option value="' + c + '">' + c + '</option>').join('');
   const regs = REGIONS.map(r => '<option value="' + r + '">' + (r || '— none —') + '</option>').join('');
@@ -457,6 +537,7 @@ function page(pw) {
 <div class="sub">Pick photos, check each one, then publish. They appear on the site straight away.
   &nbsp;<span style="opacity:.5">${PAGE_VERSION}</span></div>
 ${setupNote}
+${igNote}
 <div class="warn">
   <b>Before publishing, check the corner preview on each photo.</b> It shows the bottom-right
   of the image magnified — that is where AI tools put their watermark. Anything with a
@@ -486,6 +567,7 @@ var PW = ${JSON.stringify(pw)};
 var PRICES = ${JSON.stringify(PRICES)};
 var NAME_POOLS = ${JSON.stringify(NAME_POOLS)};
 var TONE_POOLS = ${JSON.stringify(TONE_POOLS)};
+var IG_READY = ${igReady};
 var MAX = 1400;              // display copies are capped at 1400px, same as the rest of the site
 var MIN_DPI = 170;           // matches the gallery: no soft or stretched prints
 var A3 = [11.69, 16.54];
@@ -736,6 +818,69 @@ function sendOriginal(s, onPct){
     multipart: s.file.size > 8 * 1024 * 1024,
     onUploadProgress: function(p){ if (onPct) onPct(Math.round(p.percentage)); }
   }).then(function(b){ return b.url; }).catch(function(){ return null; });
+}
+
+// Instagram's feed refuses anything narrower than 4:5 or wider than 1.91:1, and
+// two thirds of these paintings are shot 9:16. So the copy it gets is padded out
+// to a shape it accepts — never cropped, which would cut into the painting — and
+// flattened to JPEG, the only format it takes.
+function instagramCopy(w){
+  return new Promise(function(resolve, reject){
+    var im = new Image();
+    im.crossOrigin = 'anonymous';   // or the canvas is tainted and unreadable
+    im.onerror = function(){ reject(new Error('Could not load that picture.')); };
+    im.onload = function(){
+      try {
+        var iw = im.naturalWidth, ih = im.naturalHeight;
+        var ratio = iw / ih;
+        var target = Math.min(1.91, Math.max(0.8, ratio));
+        // the smallest allowed canvas that still holds the whole painting
+        var cw = iw, ch = ih;
+        if (target > ratio) cw = Math.round(ih * target);
+        else if (target < ratio) ch = Math.round(iw / target);
+        var scale = Math.min(1, 1440 / cw);
+        var c = document.createElement('canvas');
+        c.width = Math.round(cw * scale);
+        c.height = Math.round(ch * scale);
+        var ctx = c.getContext('2d');
+        // JPEG has no transparency, so the padding needs a colour of its own.
+        // The site's own dark paper tone reads as deliberate rather than broken.
+        ctx.fillStyle = '#211f1c';
+        ctx.fillRect(0, 0, c.width, c.height);
+        var dw = Math.round(iw * scale), dh = Math.round(ih * scale);
+        ctx.drawImage(im, Math.round((c.width - dw) / 2), Math.round((c.height - dh) / 2), dw, dh);
+        // paintings uploaded before the mark was burned in are still clean files,
+        // and a picture going to Instagram is exactly one worth marking
+        if (!w.watermarked) stampWatermark(ctx, c.width, c.height);
+        c.toBlob(function(b){
+          if (b) resolve(b); else reject(new Error('Could not prepare that picture.'));
+        }, 'image/jpeg', 0.9);
+      } catch (e) { reject(e); }
+    };
+    im.src = w.img_url;
+  });
+}
+
+// Parks the Instagram copy in storage so Meta has a public URL to fetch. It is
+// deleted again as soon as the post goes up.
+function sendSocial(w, blob){
+  if (!blobUpload) return Promise.reject(new Error('The uploader did not load. Reload the page.'));
+  var name = 'social/' + slugify(w.title) + '-' + Date.now().toString(36) + '.jpg';
+  return blobUpload(name, blob, {
+    access: 'public',
+    contentType: 'image/jpeg',
+    handleUploadUrl: location.pathname + '?pw=' + encodeURIComponent(PW)
+  }).then(function(b){ return b.url; });
+}
+
+// A starting caption, offered for editing rather than posted as-is.
+function captionFor(w){
+  var tag = function(s){ return '#' + slugify(s).replace(/-/g, ''); };
+  var tags = ['#watercolour', '#painting', '#art'];
+  if (w.category) tags.push(tag(w.category));
+  if (w.region) tags.push(tag(w.region));
+  if (w.style) tags.push(tag(w.style));
+  return w.title + '\n\n' + tags.join(' ') + '\n\nPrints and downloads: jhart.vercel.app';
 }
 
 // small copy sent for titling — big enough to read the picture, small enough
@@ -1055,6 +1200,11 @@ function loadLive(){
         (w.style ? ' · ' + w.style.replace(/-/g, ' ') : '') +
         ' · ' + w.price + ' · ' + w.width + '×' + w.height);
       if(w.original_pending){ d.appendChild(el('span', 'pending', 'original needed')); }
+      if(w.instagram_id){
+        var posted = el('span', 'pending', 'on instagram');
+        posted.style.background = '#4a7c59';
+        d.appendChild(posted);
+      }
       g.appendChild(d); row.appendChild(g);
 
       // Every painting uploaded before this page could send big files went up as
@@ -1085,6 +1235,34 @@ function loadLive(){
           });
         });
         row.appendChild(of); row.appendChild(ob);
+      }
+
+      // One tap: pad the picture to a shape Instagram accepts, park it in
+      // storage for Meta to fetch, post it, then delete our copy again.
+      if(IG_READY && !w.instagram_id){
+        var ig = el('button', 'btn ghost', 'Post to Instagram');
+        ig.addEventListener('click', function(){
+          var cap = prompt('Caption for Instagram:', captionFor(w));
+          if(cap === null) return;
+          ig.disabled = true; ig.textContent = 'Preparing…';
+          instagramCopy(w).then(function(blob){
+            ig.textContent = 'Sending…';
+            return sendSocial(w, blob);
+          }).then(function(url){
+            ig.textContent = 'Posting…';
+            return post({action:'instagram-post', id: w.id, imageUrl: url, caption: cap});
+          }).then(function(res){
+            if(res && res.ok){ loadLive(); }
+            else {
+              ig.disabled = false; ig.textContent = 'Post to Instagram';
+              alert((res && res.error) || 'Could not post that.');
+            }
+          }).catch(function(e){
+            ig.disabled = false; ig.textContent = 'Post to Instagram';
+            alert(e.message || 'Could not post that.');
+          });
+        });
+        row.appendChild(ig);
       }
 
       var b = el('button', 'btn ghost', 'Delete');
